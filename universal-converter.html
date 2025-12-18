@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://unpkg.com/docx@8.2.3/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.2.3/build/index.js"></script>
 </head>
 
 <body class="terminal-body">
@@ -518,22 +518,28 @@
         // ==================== DOCX GENERATION ====================
 
         async function generateDocx(text, sourceFilename) {
+            if (typeof docx === 'undefined' && typeof window.docx === 'undefined') {
+                throw new Error('DOCX library not loaded. Please check your internet connection and reload the page.');
+            }
+
+            const docxLib = typeof docx !== 'undefined' ? docx : window.docx;
+
             addLog('GENERATING_DOCX_STRUCTURE...');
             updateProgress(80, 'GENERATING_DOCX_STRUCTURE...');
 
-            const doc = new docx.Document({
+            const doc = new docxLib.Document({
                 sections: [{
                     properties: {},
                     children: text.split('\n').map(line => {
-                        return new docx.Paragraph({
-                            children: [new docx.TextRun(line)],
+                        return new docxLib.Paragraph({
+                            children: [new docxLib.TextRun(line)],
                         });
                     }),
                 }],
             });
 
             addLog('PACKAGING_DOCX...');
-            const blob = await docx.Packer.toBlob(doc);
+            const blob = await docxLib.Packer.toBlob(doc);
             const baseName = sourceFilename.replace(/\.[^.]+$/, '');
 
             return { blob, filename: `${baseName}.docx`, text };
