@@ -28,62 +28,69 @@
                 </div>
             </div>
 
-            <div class="terminal-content" style="height: 500px; display: flex; flex-direction: column;">
-                <div class="terminal-prompt-line" style="margin-bottom: 20px;">
+            <div class="terminal-prompt-line"
+                style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
                     <span class="terminal-text-green">></span> <span class="terminal-text-muted">SYSTEM_READY</span>
                 </div>
-
-                <div id="dropzone-view"
-                    style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                    <div id="dropzone" class="terminal-dropzone">
-                        <i id="main-icon" data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
-                        <h2 id="mode-title" class="terminal-text-green" style="margin: 15px 0 5px; font-weight: 700;">>
-                            INITIALIZING_MODULE...</h2>
-                        <p id="mode-desc" class="terminal-text-muted" style="font-size: 12px;">Drop files here to start
-                            the process</p>
-                    </div>
-                </div>
-                <input type="file" id="file-input" multiple style="display: none;">
-
-                <div id="status-section" style="display: none; padding: 20px; flex: 1;">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;">
-                        <span id="status-label" class="terminal-text-green">PREPARING_BUFFERS...</span>
-                        <span id="progress-percent" class="terminal-text-green">0%</span>
-                    </div>
-                    <div class="progress-container"
-                        style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
-                        <div id="progress-bar"
-                            style="height: 100%; width: 0%; background: var(--terminal-text); box-shadow: 0 0 10px var(--terminal-text); transition: width 0.1s;">
-                        </div>
-                    </div>
-                    <div id="processing-log" class="terminal-text-muted"
-                        style="font-size: 11px; margin-top: 25px; height: 150px; overflow-y: auto; line-height: 1.6; border-left: 1px solid rgba(0,255,65,0.2); padding-left: 15px;">
-                    </div>
-                </div>
-
-                <div id="results-section"
-                    style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                    <div class="terminal-text-green" style="margin-bottom: 25px; font-size: 18px; font-weight: 700;">
-                        <i data-lucide="check-circle" size="24" style="vertical-align: middle; margin-right: 10px;"></i>
-                        <span id="finish-message">TASK_COMPLETED_SUCCESSFULLY</span>
-                    </div>
-                    <div class="terminal-button-group" style="justify-content: center;">
-                        <button id="download-btn" class="terminal-btn primary">
-                            <i data-lucide="download" size="14"></i> DOWNLOAD_RESULT
-                        </button>
-                        <button id="reset-btn" class="terminal-btn">
-                            <i data-lucide="refresh-cw" size="14"></i> NEW_TASK
-                        </button>
-                    </div>
-                </div>
-
-                <div class="terminal-prompt-footer" style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
-                    <span class="terminal-text-blue">af@amazing-suite</span> <span class="terminal-text-muted">:~
-                        $</span> <span class="cursor"
-                        style="display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: middle;"></span>
+                <div id="format-selector" style="display: none; align-items: center; gap: 10px;">
+                    <span class="terminal-text-muted" style="font-size: 12px;">TARGET_FORMAT:</span>
+                    <select id="target-format" class="terminal-select" style="padding: 4px 8px; font-size: 11px;">
+                        <!-- Options populated dynamically -->
+                    </select>
                 </div>
             </div>
+
+            <div id="dropzone-view" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div id="dropzone" class="terminal-dropzone">
+                    <i id="main-icon" data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
+                    <h2 id="mode-title" class="terminal-text-green" style="margin: 15px 0 5px; font-weight: 700;">>
+                        INITIALIZING_MODULE...</h2>
+                    <p id="mode-desc" class="terminal-text-muted" style="font-size: 12px; margin-bottom: 15px;">Drop
+                        files here to start the process</p>
+                </div>
+            </div>
+            <input type="file" id="file-input" multiple style="display: none;">
+
+            <div id="status-section" style="display: none; padding: 20px; flex: 1;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;">
+                    <span id="status-label" class="terminal-text-green">PREPARING_BUFFERS...</span>
+                    <span id="progress-percent" class="terminal-text-green">0%</span>
+                </div>
+                <div class="progress-container"
+                    style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                    <div id="progress-bar"
+                        style="height: 100%; width: 0%; background: var(--terminal-text); box-shadow: 0 0 10px var(--terminal-text); transition: width 0.1s;">
+                    </div>
+                </div>
+                <div id="processing-log" class="terminal-text-muted"
+                    style="font-size: 11px; margin-top: 25px; height: 150px; overflow-y: auto; line-height: 1.6; border-left: 1px solid rgba(0,255,65,0.2); padding-left: 15px;">
+                </div>
+            </div>
+
+            <div id="results-section"
+                style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                <div class="terminal-text-green" style="margin-bottom: 25px; font-size: 18px; font-weight: 700;">
+                    <i data-lucide="check-circle" size="24" style="vertical-align: middle; margin-right: 10px;"></i>
+                    <span id="finish-message">TASK_COMPLETED_SUCCESSFULLY</span>
+                </div>
+                <div class="terminal-button-group" style="justify-content: center;">
+                    <button id="download-btn" class="terminal-btn primary">
+                        <i data-lucide="download" size="14"></i> DOWNLOAD_RESULT
+                    </button>
+                    <button id="reset-btn" class="terminal-btn">
+                        <i data-lucide="refresh-cw" size="14"></i> NEW_TASK
+                    </button>
+                </div>
+            </div>
+
+            <div class="terminal-prompt-footer" style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
+                <span class="terminal-text-blue">af@amazing-suite</span> <span class="terminal-text-muted">:~
+                    $</span> <span class="cursor"
+                    style="display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: middle;"></span>
+            </div>
         </div>
+    </div>
     </div>
 
     <!-- macOS Dock -->
@@ -105,18 +112,26 @@
 
     <script>
         const MODES = {
-            'pdf-word': { title: 'PDF ↔ WORD', icon: 'file-check', slug: 'pdf-to-docx', desc: 'Convert PDF to editable Word document' },
-            'pdf-excel': { title: 'PDF ↔ EXCEL', icon: 'file-spreadsheet', slug: 'pdf-to-xlsx', desc: 'Extract data tables to Excel' },
-            'pdf-ppt': { title: 'PDF ↔ PPT', icon: 'presentation', slug: 'pdf-to-pptx', desc: 'Convert PDF to PowerPoint slides' },
-            'pdf-text': { title: 'PDF ↔ TEXT', icon: 'file-type-2', slug: 'pdf-to-txt', desc: 'Extract raw text from PDF' },
-            'jpg-png': { title: 'JPG ↔ PNG', icon: 'camera', slug: 'image-swapper', desc: 'Convert between JPG and PNG formats' },
-            'heic-jpg': { title: 'HEIC ↔ JPG', icon: 'smartphone', slug: 'heic-converter', desc: 'Convert iPhone HEIC to JPG' },
-            'webp-img': { title: 'WEBP ↔ ANY', icon: 'layers', slug: 'webp-engine', desc: 'WebP optimization and conversion' },
-            'mp4-mp3': { title: 'MP4 ↔ MP3', icon: 'music', slug: 'audio-ext', desc: 'Extract high-quality MP3 from Video' },
-            'mov-mp4': { title: 'MOV ↔ MP4', icon: 'play', slug: 'mov-to-mp4', desc: 'Standardize Apple MOV to MP4' },
-            'wav-audio': { title: 'WAV ↔ ANY', icon: 'mic', slug: 'wav-pro', desc: 'Lossless audio conversion' },
-            'epub-pdf': { title: 'EPUB ↔ PDF', icon: 'book', slug: 'epub-to-pdf', desc: 'Convert E-books to PDF' },
-            'mobi-epub': { title: 'MOBI ↔ EPUB', icon: 'tablet', slug: 'mobi-to-epub', desc: 'Convert Kindle MOBI to EPUB' }
+            'pdf-word': { title: 'PDF ↔ WORD', icon: 'file-check', slug: 'pdf-to-docx', desc: 'Convert PDF to editable Word document', cat: 'doc', default: 'docx' },
+            'pdf-excel': { title: 'PDF ↔ EXCEL', icon: 'file-spreadsheet', slug: 'pdf-to-xlsx', desc: 'Extract data tables to Excel', cat: 'doc', default: 'xlsx' },
+            'pdf-ppt': { title: 'PDF ↔ PPT', icon: 'presentation', slug: 'pdf-to-pptx', desc: 'Convert PDF to PowerPoint slides', cat: 'doc', default: 'pptx' },
+            'pdf-text': { title: 'PDF ↔ TEXT', icon: 'file-type-2', slug: 'pdf-to-txt', desc: 'Extract raw text from PDF', cat: 'doc', default: 'txt' },
+            'jpg-png': { title: 'JPG ↔ PNG', icon: 'camera', slug: 'image-swapper', desc: 'Convert between JPG and PNG formats', cat: 'img', default: 'png' },
+            'heic-jpg': { title: 'HEIC ↔ JPG', icon: 'smartphone', slug: 'heic-converter', desc: 'Convert iPhone HEIC to JPG', cat: 'img', default: 'jpg' },
+            'webp-img': { title: 'WEBP ↔ ANY', icon: 'layers', slug: 'webp-engine', desc: 'WebP optimization and conversion', cat: 'img', default: 'webp' },
+            'mp4-mp3': { title: 'MP4 ↔ MP3', icon: 'music', slug: 'audio-ext', desc: 'Extract high-quality MP3 from Video', cat: 'video', default: 'mp3' },
+            'mov-mp4': { title: 'MOV ↔ MP4', icon: 'play', slug: 'mov-to-mp4', desc: 'Standardize Apple MOV to MP4', cat: 'video', default: 'mp4' },
+            'wav-audio': { title: 'WAV ↔ ANY', icon: 'mic', slug: 'wav-pro', desc: 'Lossless audio conversion', cat: 'audio', default: 'mp3' },
+            'epub-pdf': { title: 'EPUB ↔ PDF', icon: 'book', slug: 'epub-to-pdf', desc: 'Convert E-books to PDF', cat: 'ebook', default: 'pdf' },
+            'mobi-epub': { title: 'MOBI ↔ EPUB', icon: 'tablet', slug: 'mobi-to-epub', desc: 'Convert Kindle MOBI to EPUB', cat: 'ebook', default: 'epub' }
+        };
+
+        const CATEGORY_FORMATS = {
+            'doc': ['DOCX', 'PDF', 'TXT', 'RTF', 'ODT', 'HTML'],
+            'img': ['JPG', 'PNG', 'WEBP', 'PDF', 'GIF', 'TIFF', 'BMP'],
+            'video': ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'GIF'],
+            'audio': ['MP3', 'WAV', 'AAC', 'FLAC', 'OGG', 'M4A'],
+            'ebook': ['EPUB', 'PDF', 'MOBI', 'AZW3', 'TXT']
         };
 
         const params = new URLSearchParams(window.location.search);
@@ -127,6 +142,21 @@
         document.getElementById('mode-title').textContent = `> ${config.title}`;
         document.getElementById('mode-desc').textContent = config.desc;
         document.getElementById('mode-slug').textContent = config.slug;
+
+        // Populate Target Format Selector
+        const formatSelector = document.getElementById('target-format');
+        const formatContainer = document.getElementById('format-selector');
+
+        if (config.cat && CATEGORY_FORMATS[config.cat]) {
+            CATEGORY_FORMATS[config.cat].forEach(fmt => {
+                const opt = document.createElement('option');
+                opt.value = fmt.toLowerCase();
+                opt.textContent = fmt;
+                if (fmt.toLowerCase() === config.default) opt.selected = true;
+                formatSelector.appendChild(opt);
+            });
+            formatContainer.style.display = 'flex';
+        }
 
         const mainIcon = document.getElementById('main-icon');
         const headerIcon = document.getElementById('header-icon');
