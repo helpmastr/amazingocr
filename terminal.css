@@ -105,7 +105,6 @@
     line-height: 1.6;
 }
 
-/* Scrollbar Styling */
 .terminal-content::-webkit-scrollbar {
     width: 8px;
 }
@@ -119,32 +118,134 @@
     border-radius: 4px;
 }
 
-.prompt {
-    color: var(--terminal-prompt);
-    margin-right: 10px;
-    font-weight: bold;
-}
-
-.input-line {
+/* macOS Dock */
+.terminal-dock {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(20px);
+    padding: 10px 15px;
+    border-radius: 20px;
     display: flex;
-    align-items: center;
+    gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: dockRise 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.cursor {
-    width: 8px;
-    height: 18px;
-    background: var(--terminal-text);
-    margin-left: 2px;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    50% {
+@keyframes dockRise {
+    from {
+        transform: translate(-50%, 100px);
         opacity: 0;
+    }
+
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
     }
 }
 
-/* UI Elements */
+.dock-item {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+}
+
+.dock-item:hover {
+    transform: scale(1.4) translateY(-10px);
+    background: rgba(255, 255, 255, 0.15);
+    margin: 0 10px;
+}
+
+.dock-item i {
+    color: var(--terminal-prompt);
+}
+
+.dock-item::after {
+    content: attr(data-label);
+    position: absolute;
+    top: -40px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.dock-item:hover::after {
+    opacity: 1;
+}
+
+/* Hub Grid */
+.hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+    padding: 10px;
+}
+
+.hub-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 25px;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hub-card:hover {
+    background: rgba(80, 250, 123, 0.05);
+    border-color: var(--terminal-prompt);
+    transform: translateY(-5px);
+}
+
+.hub-card.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.hub-card.disabled:hover {
+    transform: none;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+.hub-card i {
+    color: var(--terminal-prompt);
+}
+
+.hub-card h4 {
+    margin: 0;
+    font-size: 14px;
+    color: #fff;
+}
+
+.hub-card p {
+    margin: 0;
+    font-size: 11px;
+    color: #888;
+}
+
+/* Global UI Elements */
 .terminal-dropzone {
     border: 2px dashed rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -204,11 +305,6 @@
     font-family: var(--terminal-font);
     font-size: 13px;
     outline: none;
-}
-
-.terminal-input:focus,
-.terminal-select:focus {
-    border-color: var(--terminal-prompt);
 }
 
 .terminal-text-muted {
