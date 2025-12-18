@@ -11,6 +11,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/tesseract.js@v5.0.3/dist/tesseract.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 
 <body class="terminal-body">
@@ -23,74 +25,140 @@
                     <span class="control maximize"></span>
                 </div>
                 <div class="terminal-title">
-                    <i id="header-icon" data-lucide="refresh-cw" size="14"></i> af — <span
-                        id="mode-slug">processor</span> — universal-engine
+                    <i data-lucide="refresh-cw" size="14"></i> af — universal-converter — v2
                 </div>
             </div>
 
-            <div class="terminal-prompt-line"
-                style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <span class="terminal-text-green">></span> <span class="terminal-text-muted">SYSTEM_READY</span>
-                </div>
-                <div id="format-selector" style="display: none; align-items: center; gap: 10px;">
-                    <span class="terminal-text-muted" style="font-size: 12px;">TARGET_FORMAT:</span>
-                    <select id="target-format" class="terminal-select" style="padding: 4px 8px; font-size: 11px;">
-                        <!-- Options populated dynamically -->
-                    </select>
-                </div>
-            </div>
-
-            <div id="dropzone-view" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                <div id="dropzone" class="terminal-dropzone">
-                    <i id="main-icon" data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
-                    <h2 id="mode-title" class="terminal-text-green" style="margin: 15px 0 5px; font-weight: 700;">>
-                        INITIALIZING_MODULE...</h2>
-                    <p id="mode-desc" class="terminal-text-muted" style="font-size: 12px; margin-bottom: 15px;">Drop
-                        files here to start the process</p>
-                </div>
-            </div>
-            <input type="file" id="file-input" multiple style="display: none;">
-
-            <div id="status-section" style="display: none; padding: 20px; flex: 1;">
-                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;">
-                    <span id="status-label" class="terminal-text-green">PREPARING_BUFFERS...</span>
-                    <span id="progress-percent" class="terminal-text-green">0%</span>
-                </div>
-                <div class="progress-container"
-                    style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
-                    <div id="progress-bar"
-                        style="height: 100%; width: 0%; background: var(--terminal-text); box-shadow: 0 0 10px var(--terminal-text); transition: width 0.1s;">
+            <div class="terminal-content" style="min-height: 450px;">
+                <!-- Step 1: Select Input Type -->
+                <div id="step1-view">
+                    <div style="margin-bottom: 25px;">
+                        <h2 class="terminal-text-green">> SELECT_INPUT_TYPE</h2>
+                        <p class="terminal-text-muted">Choose the type of file you want to convert.</p>
+                    </div>
+                    <div class="hub-grid" style="max-width: 600px; margin: 0 auto;">
+                        <div class="hub-card" onclick="selectInputType('doc')">
+                            <i data-lucide="file-text" size="28"></i>
+                            <h4>Documents</h4>
+                            <p>PDF, DOCX, TXT</p>
+                        </div>
+                        <div class="hub-card" onclick="selectInputType('img')">
+                            <i data-lucide="image" size="28"></i>
+                            <h4>Images</h4>
+                            <p>JPG, PNG, HEIC, WebP</p>
+                        </div>
+                        <div class="hub-card" onclick="selectInputType('video')">
+                            <i data-lucide="video" size="28"></i>
+                            <h4>Video</h4>
+                            <p>MP4, MOV, AVI</p>
+                        </div>
+                        <div class="hub-card" onclick="selectInputType('audio')">
+                            <i data-lucide="music" size="28"></i>
+                            <h4>Audio</h4>
+                            <p>MP3, WAV, FLAC</p>
+                        </div>
                     </div>
                 </div>
-                <div id="processing-log" class="terminal-text-muted"
-                    style="font-size: 11px; margin-top: 25px; height: 150px; overflow-y: auto; line-height: 1.6; border-left: 1px solid rgba(0,255,65,0.2); padding-left: 15px;">
-                </div>
-            </div>
 
-            <div id="results-section"
-                style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
-                <div class="terminal-text-green" style="margin-bottom: 25px; font-size: 18px; font-weight: 700;">
-                    <i data-lucide="check-circle" size="24" style="vertical-align: middle; margin-right: 10px;"></i>
-                    <span id="finish-message">TASK_COMPLETED_SUCCESSFULLY</span>
+                <!-- Step 2: Upload File -->
+                <div id="step2-view" style="display: none;">
+                    <div style="margin-bottom: 20px;">
+                        <span class="terminal-text-muted" style="font-size: 12px;">INPUT_TYPE:</span>
+                        <span id="selected-type-label" class="terminal-text-green"
+                            style="font-size: 12px; margin-left: 8px;">DOCUMENTS</span>
+                        <button class="terminal-btn" style="padding: 4px 10px; font-size: 11px; margin-left: 15px;"
+                            onclick="goToStep(1)">CHANGE</button>
+                    </div>
+                    <div id="dropzone" class="terminal-dropzone">
+                        <i data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
+                        <h3 class="terminal-text-green" style="margin: 15px 0 5px;">> UPLOAD_FILE</h3>
+                        <p class="terminal-text-muted" style="font-size: 12px;">Drop your file here or click to browse
+                        </p>
+                    </div>
+                    <input type="file" id="file-input" style="display: none;">
                 </div>
-                <div class="terminal-button-group" style="justify-content: center;">
-                    <button id="download-btn" class="terminal-btn primary">
-                        <i data-lucide="download" size="14"></i> DOWNLOAD_RESULT
-                    </button>
-                    <button id="reset-btn" class="terminal-btn">
-                        <i data-lucide="refresh-cw" size="14"></i> NEW_TASK
-                    </button>
-                </div>
-            </div>
 
-            <div class="terminal-prompt-footer" style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
-                <span class="terminal-text-blue">af@amazing-suite</span> <span class="terminal-text-muted">:~
-                    $</span> <span class="cursor"
-                    style="display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: middle;"></span>
+                <!-- Step 3: Select Output Format & OCR -->
+                <div id="step3-view" style="display: none;">
+                    <div style="margin-bottom: 20px;">
+                        <span class="terminal-text-muted" style="font-size: 12px;">FILE:</span>
+                        <span id="uploaded-file-label" class="terminal-text-green"
+                            style="font-size: 12px; margin-left: 8px;">document.pdf</span>
+                        <button class="terminal-btn" style="padding: 4px 10px; font-size: 11px; margin-left: 15px;"
+                            onclick="goToStep(2)">CHANGE</button>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 20px; max-width: 400px; margin: 30px auto;">
+                        <div>
+                            <label class="terminal-text-muted"
+                                style="font-size: 12px; display: block; margin-bottom: 8px;">OUTPUT_FORMAT:</label>
+                            <select id="output-format" class="terminal-select" style="width: 100%; padding: 12px;">
+                                <!-- Dynamically populated -->
+                            </select>
+                        </div>
+
+                        <div
+                            style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
+                            <input type="checkbox" id="ocr-toggle"
+                                style="width: 18px; height: 18px; accent-color: var(--terminal-text);">
+                            <label for="ocr-toggle" class="terminal-text-muted"
+                                style="font-size: 13px; cursor: pointer;">
+                                <span class="terminal-text-green">APPLY_OCR</span> — Extract text from output
+                            </label>
+                        </div>
+
+                        <button id="convert-btn" class="terminal-btn primary"
+                            style="width: 100%; justify-content: center; padding: 14px;">
+                            <i data-lucide="zap" size="16"></i> START_CONVERSION
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Processing -->
+                <div id="step4-view" style="display: none; padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;">
+                        <span id="status-label" class="terminal-text-green">PREPARING_BUFFERS...</span>
+                        <span id="progress-percent" class="terminal-text-green">0%</span>
+                    </div>
+                    <div class="progress-container"
+                        style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="progress-bar"
+                            style="height: 100%; width: 0%; background: var(--terminal-text); box-shadow: 0 0 10px var(--terminal-text); transition: width 0.1s;">
+                        </div>
+                    </div>
+                    <div id="processing-log" class="terminal-text-muted"
+                        style="font-size: 11px; margin-top: 25px; height: 120px; overflow-y: auto; line-height: 1.6; border-left: 1px solid rgba(0,255,65,0.2); padding-left: 15px;">
+                    </div>
+                </div>
+
+                <!-- Step 5: Results -->
+                <div id="step5-view" style="display: none; text-align: center; padding: 40px 20px;">
+                    <div class="terminal-text-green" style="margin-bottom: 25px; font-size: 18px; font-weight: 700;">
+                        <i data-lucide="check-circle" size="24" style="vertical-align: middle; margin-right: 10px;"></i>
+                        <span id="finish-message">CONVERSION_COMPLETE</span>
+                    </div>
+                    <div id="ocr-results" style="display: none; text-align: left; margin-bottom: 25px;">
+                        <label class="terminal-text-muted" style="font-size: 11px;">EXTRACTED_TEXT:</label>
+                        <textarea id="ocr-text" readonly class="terminal-input"
+                            style="width: 100%; min-height: 150px; margin-top: 8px; resize: none; font-size: 12px;"></textarea>
+                    </div>
+                    <div class="terminal-button-group" style="justify-content: center;">
+                        <button id="download-btn" class="terminal-btn primary">
+                            <i data-lucide="download" size="14"></i> DOWNLOAD_RESULT
+                        </button>
+                        <button id="reset-btn" class="terminal-btn" onclick="location.reload()">
+                            <i data-lucide="refresh-cw" size="14"></i> NEW_TASK
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-prompt-footer" style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
+                    <span class="terminal-text-blue">af@amazing-suite</span> <span class="terminal-text-muted">:~
+                        $</span> <span class="cursor"
+                        style="display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: middle;"></span>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
     <!-- macOS Dock -->
@@ -111,95 +179,124 @@
     </div>
 
     <script>
-        const MODES = {
-            'pdf-word': { title: 'PDF ↔ WORD', icon: 'file-check', slug: 'pdf-to-docx', desc: 'Convert PDF to editable Word document', cat: 'doc', default: 'docx' },
-            'pdf-excel': { title: 'PDF ↔ EXCEL', icon: 'file-spreadsheet', slug: 'pdf-to-xlsx', desc: 'Extract data tables to Excel', cat: 'doc', default: 'xlsx' },
-            'pdf-ppt': { title: 'PDF ↔ PPT', icon: 'presentation', slug: 'pdf-to-pptx', desc: 'Convert PDF to PowerPoint slides', cat: 'doc', default: 'pptx' },
-            'pdf-text': { title: 'PDF ↔ TEXT', icon: 'file-type-2', slug: 'pdf-to-txt', desc: 'Extract raw text from PDF', cat: 'doc', default: 'txt' },
-            'jpg-png': { title: 'JPG ↔ PNG', icon: 'camera', slug: 'image-swapper', desc: 'Convert between JPG and PNG formats', cat: 'img', default: 'png' },
-            'heic-jpg': { title: 'HEIC ↔ JPG', icon: 'smartphone', slug: 'heic-converter', desc: 'Convert iPhone HEIC to JPG', cat: 'img', default: 'jpg' },
-            'webp-img': { title: 'WEBP ↔ ANY', icon: 'layers', slug: 'webp-engine', desc: 'WebP optimization and conversion', cat: 'img', default: 'webp' },
-            'mp4-mp3': { title: 'MP4 ↔ MP3', icon: 'music', slug: 'audio-ext', desc: 'Extract high-quality MP3 from Video', cat: 'video', default: 'mp3' },
-            'mov-mp4': { title: 'MOV ↔ MP4', icon: 'play', slug: 'mov-to-mp4', desc: 'Standardize Apple MOV to MP4', cat: 'video', default: 'mp4' },
-            'wav-audio': { title: 'WAV ↔ ANY', icon: 'mic', slug: 'wav-pro', desc: 'Lossless audio conversion', cat: 'audio', default: 'mp3' },
-            'epub-pdf': { title: 'EPUB ↔ PDF', icon: 'book', slug: 'epub-to-pdf', desc: 'Convert E-books to PDF', cat: 'ebook', default: 'pdf' },
-            'mobi-epub': { title: 'MOBI ↔ EPUB', icon: 'tablet', slug: 'mobi-to-epub', desc: 'Convert Kindle MOBI to EPUB', cat: 'ebook', default: 'epub' }
+        // Configure pdf.js worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        // All output formats available
+        const ALL_OUTPUT_FORMATS = [
+            { value: 'pdf', label: 'PDF', group: 'Documents' },
+            { value: 'docx', label: 'DOCX', group: 'Documents' },
+            { value: 'txt', label: 'TXT', group: 'Documents' },
+            { value: 'jpg', label: 'JPG', group: 'Images' },
+            { value: 'png', label: 'PNG', group: 'Images' },
+            { value: 'webp', label: 'WebP', group: 'Images' },
+            { value: 'gif', label: 'GIF', group: 'Images' },
+            { value: 'mp4', label: 'MP4', group: 'Video' },
+            { value: 'mp3', label: 'MP3', group: 'Audio' },
+            { value: 'wav', label: 'WAV', group: 'Audio' }
+        ];
+
+        const INPUT_ACCEPT = {
+            'doc': '.pdf,.doc,.docx,.txt,.rtf,.odt',
+            'img': '.jpg,.jpeg,.png,.heic,.webp,.gif,.bmp,.tiff',
+            'video': '.mp4,.mov,.avi,.mkv,.webm',
+            'audio': '.mp3,.wav,.aac,.flac,.ogg,.m4a'
         };
 
-        const CATEGORY_FORMATS = {
-            'doc': ['DOCX', 'PDF', 'TXT', 'RTF', 'ODT', 'HTML'],
-            'img': ['JPG', 'PNG', 'WEBP', 'PDF', 'GIF', 'TIFF', 'BMP'],
-            'video': ['MP4', 'MOV', 'AVI', 'MKV', 'WEBM', 'GIF'],
-            'audio': ['MP3', 'WAV', 'AAC', 'FLAC', 'OGG', 'M4A'],
-            'ebook': ['EPUB', 'PDF', 'MOBI', 'AZW3', 'TXT']
+        const INPUT_LABELS = {
+            'doc': 'DOCUMENTS',
+            'img': 'IMAGES',
+            'video': 'VIDEO',
+            'audio': 'AUDIO'
         };
 
-        const params = new URLSearchParams(window.location.search);
-        const mode = params.get('mode') || 'pdf-word';
-        const config = MODES[mode] || MODES['pdf-word'];
+        let currentInputType = null;
+        let uploadedFile = null;
 
-        // UI Setup
-        document.getElementById('mode-title').textContent = `> ${config.title}`;
-        document.getElementById('mode-desc').textContent = config.desc;
-        document.getElementById('mode-slug').textContent = config.slug;
-
-        // Populate Target Format Selector
-        const formatSelector = document.getElementById('target-format');
-        const formatContainer = document.getElementById('format-selector');
-
-        if (config.cat && CATEGORY_FORMATS[config.cat]) {
-            CATEGORY_FORMATS[config.cat].forEach(fmt => {
-                const opt = document.createElement('option');
-                opt.value = fmt.toLowerCase();
-                opt.textContent = fmt;
-                if (fmt.toLowerCase() === config.default) opt.selected = true;
-                formatSelector.appendChild(opt);
-            });
-            formatContainer.style.display = 'flex';
+        function selectInputType(type) {
+            currentInputType = type;
+            document.getElementById('selected-type-label').textContent = INPUT_LABELS[type];
+            document.getElementById('file-input').accept = INPUT_ACCEPT[type];
+            goToStep(2);
         }
 
-        const mainIcon = document.getElementById('main-icon');
-        const headerIcon = document.getElementById('header-icon');
-        mainIcon.setAttribute('data-lucide', config.icon);
-        headerIcon.setAttribute('data-lucide', config.icon);
+        function goToStep(step) {
+            document.getElementById('step1-view').style.display = step === 1 ? 'block' : 'none';
+            document.getElementById('step2-view').style.display = step === 2 ? 'block' : 'none';
+            document.getElementById('step3-view').style.display = step === 3 ? 'block' : 'none';
+            document.getElementById('step4-view').style.display = step === 4 ? 'block' : 'none';
+            document.getElementById('step5-view').style.display = step === 5 ? 'block' : 'none';
+            lucide.createIcons();
+        }
 
-        lucide.createIcons();
-
-        const fileInput = document.getElementById('file-input');
+        // File upload handlers
         const dropzone = document.getElementById('dropzone');
-        const statusSection = document.getElementById('status-section');
-        const resultsSection = document.getElementById('results-section');
-        const processingLog = document.getElementById('processing-log');
-        const progressBar = document.getElementById('progress-bar');
-        const progressPercent = document.getElementById('progress-percent');
-        const statusLabel = document.getElementById('status-label');
+        const fileInput = document.getElementById('file-input');
 
         dropzone.addEventListener('click', () => fileInput.click());
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) startProcessing(Array.from(e.target.files));
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('drag-over');
+            if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
         });
 
-        async function startProcessing(files) {
-            document.getElementById('dropzone-view').style.display = 'none';
-            statusSection.style.display = 'block';
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) handleFileUpload(e.target.files[0]);
+        });
+
+        function handleFileUpload(file) {
+            uploadedFile = file;
+            document.getElementById('uploaded-file-label').textContent = file.name;
+            populateOutputFormats();
+            goToStep(3);
+        }
+
+        function populateOutputFormats() {
+            const select = document.getElementById('output-format');
+            select.innerHTML = '';
+            ALL_OUTPUT_FORMATS.forEach(fmt => {
+                const opt = document.createElement('option');
+                opt.value = fmt.value;
+                opt.textContent = `${fmt.label} (${fmt.group})`;
+                select.appendChild(opt);
+            });
+        }
+
+        // Convert button
+        document.getElementById('convert-btn').addEventListener('click', startConversion);
+
+        async function startConversion() {
+            const outputFormat = document.getElementById('output-format').value;
+            const applyOCR = document.getElementById('ocr-toggle').checked;
+
+            goToStep(4);
 
             const logs = [
                 `MOUNTING_FILESYSTEM...`,
-                `DETECTING_BUFFER_MIME: ${files[0].type || 'binary/stream'}`,
+                `DETECTING_BUFFER_MIME: ${uploadedFile.type || 'binary/stream'}`,
                 `ALLOCATING_CORE_MEMORY...`,
                 `INITIALIZING_CONVERSION_PIPELINE...`,
+                `TARGET_FORMAT: ${outputFormat.toUpperCase()}`,
+                applyOCR ? `OCR_ENGINE: ENABLED` : `OCR_ENGINE: DISABLED`,
                 `RUNNING_TRANSCODE_WASP_v2.4...`,
                 `CLEANING_TEMP_CACHE...`,
                 `FINALIZING_OUTPUT_STREAM...`
             ];
 
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercent = document.getElementById('progress-percent');
+            const statusLabel = document.getElementById('status-label');
+            const processingLog = document.getElementById('processing-log');
+            processingLog.innerHTML = '';
+
             for (let i = 0; i <= 100; i += 2) {
                 progressBar.style.width = `${i}%`;
                 progressPercent.textContent = `${i}%`;
 
-                if (i % 15 === 0) {
-                    const logIdx = Math.floor(i / 15);
+                if (i % 12 === 0) {
+                    const logIdx = Math.floor(i / 12);
                     if (logs[logIdx]) {
                         const line = document.createElement('div');
                         line.textContent = `> ${logs[logIdx]}`;
@@ -208,22 +305,52 @@
                     }
                 }
 
-                await new Promise(r => setTimeout(r, 40));
+                await new Promise(r => setTimeout(r, 30));
             }
 
-            statusSection.style.display = 'none';
-            resultsSection.style.display = 'block';
-            document.getElementById('finish-message').textContent = `${config.slug.toUpperCase()}_SUCCESS`;
+            // If OCR is enabled and output is image-based, run OCR
+            let ocrText = '';
+            if (applyOCR) {
+                statusLabel.textContent = 'RUNNING_OCR_SCAN...';
+                processingLog.innerHTML += '<div>> RUNNING_OCR_SCAN...</div>';
+
+                try {
+                    // For demo, we'll OCR the uploaded file if it's an image or PDF
+                    if (uploadedFile.type.startsWith('image/')) {
+                        const result = await Tesseract.recognize(uploadedFile, 'eng', {
+                            logger: m => {
+                                if (m.status === 'recognizing text') {
+                                    progressPercent.textContent = `OCR: ${Math.round(m.progress * 100)}%`;
+                                }
+                            }
+                        });
+                        ocrText = result.data.text;
+                    } else {
+                        ocrText = '[OCR simulation: Would extract text from converted output]';
+                    }
+                } catch (err) {
+                    ocrText = '[OCR failed: ' + err.message + ']';
+                }
+            }
+
+            // Show results
+            goToStep(5);
+            document.getElementById('finish-message').textContent = `CONVERTED_TO_${outputFormat.toUpperCase()}_SUCCESS`;
+
+            if (applyOCR && ocrText) {
+                document.getElementById('ocr-results').style.display = 'block';
+                document.getElementById('ocr-text').value = ocrText;
+            }
+
             lucide.createIcons();
         }
 
-        document.getElementById('reset-btn').addEventListener('click', () => {
-            location.reload();
+        document.getElementById('download-btn').addEventListener('click', () => {
+            alert('Simulation Mode: In production, this would download the converted file.');
         });
 
-        document.getElementById('download-btn').addEventListener('click', () => {
-            alert('Simulation Mode: In a production environment, this would start the download of the processed file.');
-        });
+        // Initialize
+        lucide.createIcons();
     </script>
 </body>
 
