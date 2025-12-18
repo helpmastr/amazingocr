@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmazingSuite | Developer Utilities</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="terminal.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body class="terminal-body">
+    <div class="terminal-container">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="window-controls">
+                    <span class="control close" onclick="window.location.href='hub.html'"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
+                </div>
+                <div class="terminal-title">
+                    <i data-lucide="code" size="14"></i> af — dev-utils — v1.0
+                </div>
+            </div>
+
+            <div class="terminal-content" style="display: flex; gap: 20px; padding: 0; min-height: 500px;">
+                <!-- Sidebar -->
+                <div
+                    style="width: 180px; border-right: 1px solid rgba(255,255,255,0.08); padding: 20px; display: flex; flex-direction: column; gap: 10px;">
+                    <button class="terminal-nav-item active" onclick="switchTool('json')" id="nav-json">
+                        <i data-lucide="braces" size="14"></i> JSON_MASTER
+                    </button>
+                    <button class="terminal-nav-item" onclick="switchTool('codec')" id="nav-codec">
+                        <i data-lucide="binary" size="14"></i> CODEC_HUB
+                    </button>
+                    <button class="terminal-nav-item" onclick="switchTool('security')" id="nav-security">
+                        <i data-lucide="shield-check" size="14"></i> SECURITY_STN
+                    </button>
+                    <button class="terminal-nav-item" onclick="switchTool('utils')" id="nav-utils">
+                        <i data-lucide="wrench" size="14"></i> GEN_UTILS
+                    </button>
+                </div>
+
+                <!-- Main Content -->
+                <div style="flex: 1; padding: 25px; overflow-y: auto;">
+
+                    <!-- JSON Master -->
+                    <div id="tool-json" class="tool-view">
+                        <h3 class="terminal-text-green">> JSON_MASTER</h3>
+                        <p class="terminal-text-muted" style="margin-bottom: 20px;">Pretty print, minify, and validate
+                            JSON data.</p>
+                        <textarea id="json-input" class="terminal-input"
+                            style="width: 100%; height: 200px; margin-bottom: 15px;"
+                            placeholder="Paste JSON here..."></textarea>
+                        <div class="terminal-button-group">
+                            <button class="terminal-btn primary" onclick="processJSON('pretty')">PRETTY_PRINT</button>
+                            <button class="terminal-btn" onclick="processJSON('minify')">MINIFY</button>
+                            <button class="terminal-btn" onclick="copyResult('json-input')">COPY</button>
+                        </div>
+                        <div id="json-error" class="terminal-text-red"
+                            style="margin-top: 10px; font-size: 12px; display: none;"></div>
+                    </div>
+
+                    <!-- Codec Hub -->
+                    <div id="tool-codec" class="tool-view" style="display: none;">
+                        <h3 class="terminal-text-green">> CODEC_HUB</h3>
+                        <p class="terminal-text-muted" style="margin-bottom: 20px;">Base64 and URL encoding/decoding.
+                        </p>
+                        <textarea id="codec-input" class="terminal-input"
+                            style="width: 100%; height: 150px; margin-bottom: 15px;"
+                            placeholder="Enter text..."></textarea>
+                        <div class="terminal-button-group">
+                            <button class="terminal-btn primary" onclick="processCodec('b64e')">B64_ENCODE</button>
+                            <button class="terminal-btn primary" onclick="processCodec('b64d')">B64_DECODE</button>
+                            <button class="terminal-btn" onclick="processCodec('urle')">URL_ENCODE</button>
+                            <button class="terminal-btn" onclick="processCodec('urld')">URL_DECODE</button>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <label class="terminal-text-muted" style="font-size: 11px;">OUTPUT:</label>
+                            <textarea id="codec-output" class="terminal-input"
+                                style="width: 100%; height: 100px; margin-top: 8px;" readonly></textarea>
+                            <button class="terminal-btn" style="margin-top: 10px;"
+                                onclick="copyResult('codec-output')">COPY_RESULT</button>
+                        </div>
+                    </div>
+
+                    <!-- Security Station -->
+                    <div id="tool-security" class="tool-view" style="display: none;">
+                        <h3 class="terminal-text-green">> SECURITY_STATION</h3>
+                        <p class="terminal-text-muted" style="margin-bottom: 20px;">Generate hashes and decode JWT
+                            tokens.</p>
+                        <textarea id="security-input" class="terminal-input"
+                            style="width: 100%; height: 120px; margin-bottom: 15px;"
+                            placeholder="Enter text or JWT..."></textarea>
+                        <div class="terminal-button-group">
+                            <button class="terminal-btn primary" onclick="processSecurity('sha256')">SHA-256</button>
+                            <button class="terminal-btn primary" onclick="processSecurity('md5')">MD5</button>
+                            <button class="terminal-btn" onclick="processSecurity('jwt')">DECODE_JWT</button>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <label class="terminal-text-muted" style="font-size: 11px;">RESULT_LAYER:</label>
+                            <div id="security-result" class="terminal-input"
+                                style="width: 100%; min-height: 80px; margin-top: 8px; padding: 15px; font-size: 13px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); word-break: break-all; color: var(--terminal-text);">
+                                ---</div>
+                            <button class="terminal-btn" style="margin-top: 10px;"
+                                onclick="copySecurityResult()">COPY</button>
+                        </div>
+                    </div>
+
+                    <!-- General Utils -->
+                    <div id="tool-utils" class="tool-view" style="display: none;">
+                        <h3 class="terminal-text-green">> GENERAL_UTILS</h3>
+                        <p class="terminal-text-muted" style="margin-bottom: 20px;">UUID generation and timestamp tools.
+                        </p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="terminal-card" style="padding: 15px; background: rgba(255,255,255,0.03);">
+                                <label class="terminal-text-muted" style="font-size: 11px;">UUID_GENERATOR</label>
+                                <div id="uuid-display" class="terminal-text-green"
+                                    style="margin: 15px 0; font-size: 14px;">Generating...</div>
+                                <button class="terminal-btn" onclick="generateUUID()">NEW_UUID</button>
+                                <button class="terminal-btn" onclick="copyResultText('uuid-display')">COPY</button>
+                            </div>
+                            <div class="terminal-card" style="padding: 15px; background: rgba(255,255,255,0.03);">
+                                <label class="terminal-text-muted" style="font-size: 11px;">UNIX_TIMESTAMP</label>
+                                <div id="time-display" class="terminal-text-blue"
+                                    style="margin: 15px 0; font-size: 14px;">0000000000</div>
+                                <button class="terminal-btn" onclick="copyResultText('time-display')">COPY</button>
+                            </div>
+                        </div>
+                        <div style="margin-top: 30px;">
+                            <label class="terminal-text-muted" style="font-size: 11px;">EPOCH_CONVERTER</label>
+                            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                <input type="text" id="epoch-input" class="terminal-input" style="flex: 1;"
+                                    placeholder="Enter Unix timestamp...">
+                                <button class="terminal-btn primary" onclick="convertEpoch()">CONVERT</button>
+                            </div>
+                            <div id="epoch-result" class="terminal-text-blue"
+                                style="margin-top: 10px; font-size: 13px;">---</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- macOS Dock -->
+    <div class="terminal-dock">
+        <div class="dock-item" data-label="Home" onclick="window.location.href='index.html'">
+            <i data-lucide="home"></i>
+        </div>
+        <div class="dock-item" data-label="Converter Hub" onclick="window.location.href='hub.html'">
+            <i data-lucide="layout-grid"></i>
+        </div>
+        <div class="dock-item" data-label="OCR Engine" onclick="window.location.href='engine.html'">
+            <i data-lucide="scan-text"></i>
+        </div>
+        <div class="dock-item" data-label="GitHub"
+            onclick="window.open('https://github.com/helpmastr/amazingocr', '_blank')">
+            <i data-lucide="github"></i>
+        </div>
+    </div>
+
+    <style>
+        .terminal-nav-item {
+            background: none;
+            border: 1px solid transparent;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 10px 12px;
+            text-align: left;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .terminal-nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--terminal-text);
+        }
+
+        .terminal-nav-item.active {
+            background: rgba(0, 255, 65, 0.1);
+            color: var(--terminal-text);
+            border-color: rgba(0, 255, 65, 0.3);
+        }
+
+        .terminal-card {
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+        }
+    </style>
+
+    <script>
+        function switchTool(tool) {
+            document.querySelectorAll('.tool-view').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.terminal-nav-item').forEach(n => n.classList.remove('active'));
+
+            document.getElementById(`tool-${tool}`).style.display = 'block';
+            document.getElementById(`nav-${tool}`).classList.add('active');
+
+            // Set URL param
+            const url = new URL(window.location);
+            url.searchParams.set('tool', tool);
+            window.history.pushState({}, '', url);
+        }
+
+        // Initialize from URL
+        const params = new URLSearchParams(window.location.search);
+        const activeTool = params.get('tool') || 'json';
+        switchTool(activeTool);
+
+        // JSON Logic
+        function processJSON(mode) {
+            const input = document.getElementById('json-input');
+            const error = document.getElementById('json-error');
+            error.style.display = 'none';
+
+            try {
+                const parsed = JSON.parse(input.value);
+                input.value = mode === 'pretty' ? JSON.stringify(parsed, null, 4) : JSON.stringify(parsed);
+            } catch (e) {
+                error.textContent = `ERR: ${e.message}`;
+                error.style.display = 'block';
+            }
+        }
+
+        // Codec Logic
+        function processCodec(mode) {
+            const input = document.getElementById('codec-input').value;
+            const output = document.getElementById('codec-output');
+
+            try {
+                if (mode === 'b64e') output.value = btoa(input);
+                if (mode === 'b64d') output.value = atob(input);
+                if (mode === 'urle') output.value = encodeURIComponent(input);
+                if (mode === 'urld') output.value = decodeURIComponent(input);
+            } catch (e) {
+                output.value = `ERR: ${e.message}`;
+            }
+        }
+
+        // Security Logic
+        function processSecurity(mode) {
+            const input = document.getElementById('security-input').value;
+            const res = document.getElementById('security-result');
+
+            if (mode === 'sha256') res.textContent = CryptoJS.SHA256(input).toString();
+            if (mode === 'md5') res.textContent = CryptoJS.MD5(input).toString();
+            if (mode === 'jwt') {
+                try {
+                    const parts = input.split('.');
+                    if (parts.length < 2) throw new Error('Invalid JWT format');
+                    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                    res.innerHTML = `<pre style="margin:0">${JSON.stringify(payload, null, 2)}</pre>`;
+                } catch (e) {
+                    res.textContent = `ERR: ${e.message}`;
+                }
+            }
+        }
+
+        // Utils Logic
+        function generateUUID() {
+            const uuid = crypto.randomUUID();
+            document.getElementById('uuid-display').textContent = uuid;
+        }
+
+        function updateTime() {
+            document.getElementById('time-display').textContent = Math.floor(Date.now() / 1000);
+        }
+
+        function convertEpoch() {
+            const input = document.getElementById('epoch-input').value;
+            const res = document.getElementById('epoch-result');
+            try {
+                const date = new Date(parseInt(input) * 1000);
+                res.textContent = `DATE_UTC: ${date.toUTCString()} | LOCAL: ${date.toLocaleString()}`;
+            } catch (e) {
+                res.textContent = 'ERR: Invalid Epoch';
+            }
+        }
+
+        // Helpers
+        function copyResult(id) {
+            const el = document.getElementById(id);
+            el.select();
+            document.execCommand('copy');
+        }
+
+        function copySecurityResult() {
+            const text = document.getElementById('security-result').innerText;
+            navigator.clipboard.writeText(text);
+        }
+
+        function copyResultText(id) {
+            const text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text);
+        }
+
+        setInterval(updateTime, 1000);
+        generateUUID();
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

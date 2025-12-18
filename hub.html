@@ -137,30 +137,58 @@
                             <p>Format Sync</p>
                         </div>
                     </div>
-                </div>
+                    <!-- Developer Utilities -->
+                    <div class="hub-section">
+                        <div class="hub-section-header">
+                            <i data-lucide="code" size="16"></i>
+                            <span>DEV UTILITIES</span>
+                        </div>
+                        <div class="hub-grid">
+                            <div class="hub-card" onclick="window.location.href='dev-tools.html?tool=json'">
+                                <i data-lucide="braces" size="24"></i>
+                                <h4>JSON Master</h4>
+                                <p>Format & Lint</p>
+                            </div>
+                            <div class="hub-card" onclick="window.location.href='dev-tools.html?tool=codec'">
+                                <i data-lucide="binary" size="24"></i>
+                                <h4>Codec Hub</h4>
+                                <p>Base64 / URL</p>
+                            </div>
+                            <div class="hub-card" onclick="window.location.href='dev-tools.html?tool=security'">
+                                <i data-lucide="shield-check" size="24"></i>
+                                <h4>Security Station</h4>
+                                <p>Hashes & JWT</p>
+                            </div>
+                            <div class="hub-card" onclick="window.location.href='dev-tools.html?tool=utils'">
+                                <i data-lucide="wrench" size="24"></i>
+                                <h4>General Utils</h4>
+                                <p>UUID & Time</p>
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- macOS Dock -->
-    <div class="terminal-dock">
-        <div class="dock-item" data-label="Home" onclick="window.location.href='index.html'">
-            <i data-lucide="home"></i>
+        <!-- macOS Dock -->
+        <div class="terminal-dock">
+            <div class="dock-item" data-label="Home" onclick="window.location.href='index.html'">
+                <i data-lucide="home"></i>
+            </div>
+            <div class="dock-item" data-label="Converter Hub" onclick="window.location.href='hub.html'">
+                <i data-lucide="layout-grid"></i>
+            </div>
+            <div class="dock-item" data-label="OCR Engine" onclick="window.location.href='engine.html'">
+                <i data-lucide="scan-text"></i>
+            </div>
+            <div class="dock-item" data-label="GitHub"
+                onclick="window.open('https://github.com/helpmastr/amazingocr', '_blank')">
+                <i data-lucide="github"></i>
+            </div>
         </div>
-        <div class="dock-item" data-label="Converter Hub" onclick="window.location.href='hub.html'">
-            <i data-lucide="layout-grid"></i>
-        </div>
-        <div class="dock-item" data-label="OCR Engine" onclick="window.location.href='engine.html'">
-            <i data-lucide="scan-text"></i>
-        </div>
-        <div class="dock-item" data-label="GitHub"
-            onclick="window.open('https://github.com/helpmastr/amazingocr', '_blank')">
-            <i data-lucide="github"></i>
-        </div>
-    </div>
 
-    <script>lucide.createIcons();</script>
+        <script>lucide.createIcons();</script>
 </body>
 
 </html>

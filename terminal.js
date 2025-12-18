@@ -6,6 +6,7 @@ const commands = {
     <span class="terminal-text-blue">/hub</span> - Open Master Converter Hub<br>
     <span class="terminal-text-blue">/ocr</span> - Launch 500 DPI OCR Engine<br>
     <span class="terminal-text-blue">/convert</span> - Image to PDF Converter<br>
+    <span class="terminal-text-blue">/dev</span> - Developer Utilities Terminal<br>
     <span class="terminal-text-blue">/clear</span> - Clear terminal screen`,
 
     '/hub': () => {
@@ -24,6 +25,12 @@ const commands = {
         addLine('Launching Image Converter...', 'info');
         setTimeout(() => window.location.href = 'converter.html', 1000);
         return 'Warming up PDF-Lib engines...';
+    },
+
+    '/dev': () => {
+        addLine('Accessing Developer Terminal...', 'info');
+        setTimeout(() => window.location.href = 'dev-tools.html', 1000);
+        return 'Mounting developer utilities...';
     },
 
     '/office': () => 'Error: Office Data Connector in Beta. Access restricted.',
