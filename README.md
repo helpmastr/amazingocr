@@ -17,14 +17,6 @@
 
 ---
 
-## 📸 visual Overview
-
-<p align="center">
-  <img src="assets/hero-mockup.png" alt="App Interface Mockup" width="45%">
-  <img src="assets/privacy-security.png" alt="Privacy Shield" width="45%">
-</p>
-
----
 
 ## 🚀 Getting Started
 
