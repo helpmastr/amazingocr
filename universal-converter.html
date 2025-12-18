@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/docx@8.2.3/build/index.js"></script>
 </head>
 
 <body class="terminal-body">
@@ -193,6 +194,7 @@
             { value: 'jpg', label: 'JPG (Image)', types: ['doc', 'img'] },
             { value: 'webp', label: 'WebP (Image)', types: ['doc', 'img'] },
             { value: 'txt', label: 'TXT (Text Extraction)', types: ['doc', 'img'] },
+            { value: 'docx', label: 'DOCX (Word Document)', types: ['doc', 'img'] },
             { value: 'bmp', label: 'BMP (Image)', types: ['doc', 'img'] }
         ];
 
@@ -295,12 +297,18 @@
                         result = await convertImageToPDF(uploadedFile);
                     } else if (outputFormat === 'txt') {
                         result = await runOCR(uploadedFile);
+                    } else if (outputFormat === 'docx') {
+                        const ocr = await runOCR(uploadedFile);
+                        result = await generateDocx(ocr.ocrText, uploadedFile.name);
                     } else {
                         result = await convertImageFormat(uploadedFile, outputFormat);
                     }
                 } else if (currentInputType === 'doc') {
                     if (outputFormat === 'txt') {
                         result = await extractTextFromPDF(uploadedFile, forceOCR);
+                    } else if (outputFormat === 'docx') {
+                        const extraction = await extractTextFromPDF(uploadedFile, forceOCR);
+                        result = await generateDocx(extraction.text, uploadedFile.name);
                     } else if (outputFormat === 'pdf') {
                         result = await optimizePDF(uploadedFile);
                     } else {
@@ -505,6 +513,30 @@
             if (ocrFullText) zip.file('ocr_results.txt', ocrFullText);
             const content = await zip.generateAsync({ type: 'blob' });
             return { blob: content, filename: `${baseName}_export.zip` };
+        }
+
+        // ==================== DOCX GENERATION ====================
+
+        async function generateDocx(text, sourceFilename) {
+            addLog('GENERATING_DOCX_STRUCTURE...');
+            updateProgress(80, 'GENERATING_DOCX_STRUCTURE...');
+
+            const doc = new docx.Document({
+                sections: [{
+                    properties: {},
+                    children: text.split('\n').map(line => {
+                        return new docx.Paragraph({
+                            children: [new docx.TextRun(line)],
+                        });
+                    }),
+                }],
+            });
+
+            addLog('PACKAGING_DOCX...');
+            const blob = await docx.Packer.toBlob(doc);
+            const baseName = sourceFilename.replace(/\.[^.]+$/, '');
+
+            return { blob, filename: `${baseName}.docx`, text };
         }
 
         async function optimizePDF(file) {
