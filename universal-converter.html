@@ -13,6 +13,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://unpkg.com/tesseract.js@v5.0.3/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 
 <body class="terminal-body">
@@ -25,7 +27,7 @@
                     <span class="control maximize"></span>
                 </div>
                 <div class="terminal-title">
-                    <i data-lucide="refresh-cw" size="14"></i> af — universal-converter — v2
+                    <i data-lucide="refresh-cw" size="14"></i> af — universal-converter — v3
                 </div>
             </div>
 
@@ -40,24 +42,17 @@
                         <div class="hub-card" onclick="selectInputType('doc')">
                             <i data-lucide="file-text" size="28"></i>
                             <h4>Documents</h4>
-                            <p>PDF, DOCX, TXT</p>
+                            <p>PDF</p>
                         </div>
                         <div class="hub-card" onclick="selectInputType('img')">
                             <i data-lucide="image" size="28"></i>
                             <h4>Images</h4>
-                            <p>JPG, PNG, HEIC, WebP</p>
-                        </div>
-                        <div class="hub-card" onclick="selectInputType('video')">
-                            <i data-lucide="video" size="28"></i>
-                            <h4>Video</h4>
-                            <p>MP4, MOV, AVI</p>
-                        </div>
-                        <div class="hub-card" onclick="selectInputType('audio')">
-                            <i data-lucide="music" size="28"></i>
-                            <h4>Audio</h4>
-                            <p>MP3, WAV, FLAC</p>
+                            <p>JPG, PNG, WebP, GIF</p>
                         </div>
                     </div>
+                    <p class="terminal-text-muted" style="text-align: center; margin-top: 20px; font-size: 11px;">
+                        💡 Video/Audio conversion requires server-side processing
+                    </p>
                 </div>
 
                 <!-- Step 2: Upload File -->
@@ -97,7 +92,7 @@
                             </select>
                         </div>
 
-                        <div
+                        <div id="ocr-option"
                             style="display: flex; align-items: center; gap: 12px; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.08);">
                             <input type="checkbox" id="ocr-toggle"
                                 style="width: 18px; height: 18px; accent-color: var(--terminal-text);">
@@ -182,36 +177,33 @@
         // Configure pdf.js worker
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        // All output formats available
-        const ALL_OUTPUT_FORMATS = [
-            { value: 'pdf', label: 'PDF', group: 'Documents' },
-            { value: 'docx', label: 'DOCX', group: 'Documents' },
-            { value: 'txt', label: 'TXT', group: 'Documents' },
-            { value: 'jpg', label: 'JPG', group: 'Images' },
-            { value: 'png', label: 'PNG', group: 'Images' },
-            { value: 'webp', label: 'WebP', group: 'Images' },
-            { value: 'gif', label: 'GIF', group: 'Images' },
-            { value: 'mp4', label: 'MP4', group: 'Video' },
-            { value: 'mp3', label: 'MP3', group: 'Audio' },
-            { value: 'wav', label: 'WAV', group: 'Audio' }
-        ];
-
         const INPUT_ACCEPT = {
-            'doc': '.pdf,.doc,.docx,.txt,.rtf,.odt',
-            'img': '.jpg,.jpeg,.png,.heic,.webp,.gif,.bmp,.tiff',
-            'video': '.mp4,.mov,.avi,.mkv,.webm',
-            'audio': '.mp3,.wav,.aac,.flac,.ogg,.m4a'
+            'doc': '.pdf',
+            'img': '.jpg,.jpeg,.png,.webp,.gif,.bmp'
         };
 
         const INPUT_LABELS = {
-            'doc': 'DOCUMENTS',
-            'img': 'IMAGES',
-            'video': 'VIDEO',
-            'audio': 'AUDIO'
+            'doc': 'DOCUMENTS (PDF)',
+            'img': 'IMAGES'
+        };
+
+        const OUTPUT_FORMATS = {
+            'doc': [
+                { value: 'png', label: 'PNG (Image)' },
+                { value: 'jpg', label: 'JPG (Image)' }
+            ],
+            'img': [
+                { value: 'pdf', label: 'PDF (Document)' },
+                { value: 'png', label: 'PNG' },
+                { value: 'jpg', label: 'JPG' },
+                { value: 'webp', label: 'WebP' }
+            ]
         };
 
         let currentInputType = null;
         let uploadedFile = null;
+        let convertedBlob = null;
+        let convertedFileName = '';
 
         function selectInputType(type) {
             currentInputType = type;
@@ -256,12 +248,30 @@
         function populateOutputFormats() {
             const select = document.getElementById('output-format');
             select.innerHTML = '';
-            ALL_OUTPUT_FORMATS.forEach(fmt => {
+            const formats = OUTPUT_FORMATS[currentInputType] || [];
+            formats.forEach(fmt => {
                 const opt = document.createElement('option');
                 opt.value = fmt.value;
-                opt.textContent = `${fmt.label} (${fmt.group})`;
+                opt.textContent = fmt.label;
                 select.appendChild(opt);
             });
+
+            // Show OCR option only for image outputs
+            const ocrOption = document.getElementById('ocr-option');
+            ocrOption.style.display = currentInputType === 'doc' ? 'flex' : 'none';
+        }
+
+        // Progress helpers
+        function updateProgress(percent, label) {
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-percent').textContent = `${Math.round(percent)}%`;
+            document.getElementById('status-label').textContent = label;
+        }
+
+        function addLog(text) {
+            const log = document.getElementById('processing-log');
+            log.innerHTML += `<div>> ${text}</div>`;
+            log.scrollTop = log.scrollHeight;
         }
 
         // Convert button
@@ -272,81 +282,259 @@
             const applyOCR = document.getElementById('ocr-toggle').checked;
 
             goToStep(4);
+            document.getElementById('processing-log').innerHTML = '';
 
-            const logs = [
-                `MOUNTING_FILESYSTEM...`,
-                `DETECTING_BUFFER_MIME: ${uploadedFile.type || 'binary/stream'}`,
-                `ALLOCATING_CORE_MEMORY...`,
-                `INITIALIZING_CONVERSION_PIPELINE...`,
-                `TARGET_FORMAT: ${outputFormat.toUpperCase()}`,
-                applyOCR ? `OCR_ENGINE: ENABLED` : `OCR_ENGINE: DISABLED`,
-                `RUNNING_TRANSCODE_WASP_v2.4...`,
-                `CLEANING_TEMP_CACHE...`,
-                `FINALIZING_OUTPUT_STREAM...`
-            ];
+            try {
+                addLog('MOUNTING_FILESYSTEM...');
+                updateProgress(5, 'MOUNTING_FILESYSTEM...');
+                await sleep(200);
 
-            const progressBar = document.getElementById('progress-bar');
-            const progressPercent = document.getElementById('progress-percent');
-            const statusLabel = document.getElementById('status-label');
-            const processingLog = document.getElementById('processing-log');
-            processingLog.innerHTML = '';
+                addLog(`INPUT_FILE: ${uploadedFile.name}`);
+                addLog(`OUTPUT_FORMAT: ${outputFormat.toUpperCase()}`);
+                updateProgress(10, 'ANALYZING_INPUT...');
+                await sleep(200);
 
-            for (let i = 0; i <= 100; i += 2) {
-                progressBar.style.width = `${i}%`;
-                progressPercent.textContent = `${i}%`;
+                let result;
 
-                if (i % 12 === 0) {
-                    const logIdx = Math.floor(i / 12);
-                    if (logs[logIdx]) {
-                        const line = document.createElement('div');
-                        line.textContent = `> ${logs[logIdx]}`;
-                        processingLog.appendChild(line);
-                        statusLabel.textContent = logs[logIdx];
-                    }
-                }
-
-                await new Promise(r => setTimeout(r, 30));
-            }
-
-            // If OCR is enabled and output is image-based, run OCR
-            let ocrText = '';
-            if (applyOCR) {
-                statusLabel.textContent = 'RUNNING_OCR_SCAN...';
-                processingLog.innerHTML += '<div>> RUNNING_OCR_SCAN...</div>';
-
-                try {
-                    // For demo, we'll OCR the uploaded file if it's an image or PDF
-                    if (uploadedFile.type.startsWith('image/')) {
-                        const result = await Tesseract.recognize(uploadedFile, 'eng', {
-                            logger: m => {
-                                if (m.status === 'recognizing text') {
-                                    progressPercent.textContent = `OCR: ${Math.round(m.progress * 100)}%`;
-                                }
-                            }
-                        });
-                        ocrText = result.data.text;
+                if (currentInputType === 'img') {
+                    // Image conversions
+                    if (outputFormat === 'pdf') {
+                        result = await convertImageToPDF(uploadedFile);
                     } else {
-                        ocrText = '[OCR simulation: Would extract text from converted output]';
+                        result = await convertImageFormat(uploadedFile, outputFormat);
                     }
-                } catch (err) {
-                    ocrText = '[OCR failed: ' + err.message + ']';
+                } else if (currentInputType === 'doc') {
+                    // PDF to Image
+                    result = await convertPDFToImages(uploadedFile, outputFormat, applyOCR);
                 }
+
+                convertedBlob = result.blob;
+                convertedFileName = result.filename;
+
+                updateProgress(100, 'CONVERSION_COMPLETE');
+                addLog('CONVERSION_COMPLETE');
+                await sleep(300);
+
+                goToStep(5);
+                document.getElementById('finish-message').textContent = `CONVERTED_TO_${outputFormat.toUpperCase()}_SUCCESS`;
+
+                if (result.ocrText) {
+                    document.getElementById('ocr-results').style.display = 'block';
+                    document.getElementById('ocr-text').value = result.ocrText;
+                }
+
+                lucide.createIcons();
+
+            } catch (err) {
+                addLog(`ERROR: ${err.message}`);
+                updateProgress(0, 'CONVERSION_FAILED');
+                alert('Conversion failed: ' + err.message);
             }
-
-            // Show results
-            goToStep(5);
-            document.getElementById('finish-message').textContent = `CONVERTED_TO_${outputFormat.toUpperCase()}_SUCCESS`;
-
-            if (applyOCR && ocrText) {
-                document.getElementById('ocr-results').style.display = 'block';
-                document.getElementById('ocr-text').value = ocrText;
-            }
-
-            lucide.createIcons();
         }
 
+        // ==================== ACTUAL CONVERSION FUNCTIONS ====================
+
+        async function convertImageFormat(file, targetFormat) {
+            addLog('LOADING_IMAGE...');
+            updateProgress(20, 'LOADING_IMAGE...');
+
+            const img = await loadImage(file);
+
+            addLog('CREATING_CANVAS...');
+            updateProgress(40, 'CREATING_CANVAS...');
+
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+
+            // White background for JPG (no transparency)
+            if (targetFormat === 'jpg' || targetFormat === 'jpeg') {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
+            ctx.drawImage(img, 0, 0);
+
+            addLog('ENCODING_OUTPUT...');
+            updateProgress(70, 'ENCODING_OUTPUT...');
+
+            const mimeType = targetFormat === 'jpg' ? 'image/jpeg' :
+                targetFormat === 'webp' ? 'image/webp' : 'image/png';
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.92));
+
+            const baseName = file.name.replace(/\.[^.]+$/, '');
+            const filename = `${baseName}_converted.${targetFormat}`;
+
+            updateProgress(90, 'FINALIZING...');
+            addLog('OUTPUT_READY');
+
+            return { blob, filename };
+        }
+
+        async function convertImageToPDF(file) {
+            addLog('LOADING_IMAGE...');
+            updateProgress(20, 'LOADING_IMAGE...');
+
+            const img = await loadImage(file);
+            const arrayBuffer = await file.arrayBuffer();
+
+            addLog('CREATING_PDF_DOCUMENT...');
+            updateProgress(40, 'CREATING_PDF_DOCUMENT...');
+
+            const pdfDoc = await PDFLib.PDFDocument.create();
+
+            let embeddedImage;
+            const fileType = file.type;
+
+            if (fileType === 'image/png') {
+                embeddedImage = await pdfDoc.embedPng(arrayBuffer);
+            } else {
+                // Convert to JPG for other formats
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+
+                const jpgBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
+                const jpgBuffer = await jpgBlob.arrayBuffer();
+                embeddedImage = await pdfDoc.embedJpg(jpgBuffer);
+            }
+
+            addLog('ADDING_PAGE...');
+            updateProgress(60, 'ADDING_PAGE...');
+
+            const page = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
+            page.drawImage(embeddedImage, {
+                x: 0,
+                y: 0,
+                width: embeddedImage.width,
+                height: embeddedImage.height
+            });
+
+            addLog('SAVING_PDF...');
+            updateProgress(80, 'SAVING_PDF...');
+
+            const pdfBytes = await pdfDoc.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+            const baseName = file.name.replace(/\.[^.]+$/, '');
+            const filename = `${baseName}.pdf`;
+
+            addLog('OUTPUT_READY');
+
+            return { blob, filename };
+        }
+
+        async function convertPDFToImages(file, outputFormat, applyOCR) {
+            addLog('LOADING_PDF...');
+            updateProgress(10, 'LOADING_PDF...');
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const totalPages = pdf.numPages;
+
+            addLog(`DETECTED_PAGES: ${totalPages}`);
+
+            const images = [];
+            let ocrText = '';
+
+            for (let i = 1; i <= totalPages; i++) {
+                const progress = 10 + (70 * (i / totalPages));
+                addLog(`RENDERING_PAGE_${i}...`);
+                updateProgress(progress, `RENDERING_PAGE_${i}/${totalPages}...`);
+
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 2.0 }); // Good quality
+
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+
+                await page.render({ canvasContext: ctx, viewport }).promise;
+
+                const mimeType = outputFormat === 'jpg' ? 'image/jpeg' : 'image/png';
+                const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.92));
+                images.push({ blob, pageNum: i });
+
+                // Run OCR if requested
+                if (applyOCR) {
+                    addLog(`OCR_SCANNING_PAGE_${i}...`);
+                    try {
+                        const result = await Tesseract.recognize(canvas, 'eng');
+                        ocrText += `--- Page ${i} ---\n${result.data.text}\n\n`;
+                    } catch (e) {
+                        ocrText += `--- Page ${i} ---\n[OCR Error: ${e.message}]\n\n`;
+                    }
+                }
+            }
+
+            addLog('PACKAGING_OUTPUT...');
+            updateProgress(85, 'PACKAGING_OUTPUT...');
+
+            let resultBlob, resultFilename;
+
+            if (images.length === 1) {
+                resultBlob = images[0].blob;
+                const baseName = file.name.replace(/\.[^.]+$/, '');
+                resultFilename = `${baseName}_page1.${outputFormat}`;
+            } else {
+                // Multiple pages - create ZIP
+                addLog('CREATING_ZIP_ARCHIVE...');
+                const zip = new JSZip();
+                const baseName = file.name.replace(/\.[^.]+$/, '');
+
+                for (const img of images) {
+                    zip.file(`${baseName}_page${img.pageNum}.${outputFormat}`, img.blob);
+                }
+
+                if (ocrText) {
+                    zip.file(`${baseName}_ocr.txt`, ocrText);
+                }
+
+                resultBlob = await zip.generateAsync({ type: 'blob' });
+                resultFilename = `${baseName}_pages.zip`;
+            }
+
+            addLog('OUTPUT_READY');
+
+            return { blob: resultBlob, filename: resultFilename, ocrText: applyOCR ? ocrText : null };
+        }
+
+        // Helpers
+        function loadImage(file) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Download handler
         document.getElementById('download-btn').addEventListener('click', () => {
-            alert('Simulation Mode: In production, this would download the converted file.');
+            if (!convertedBlob) {
+                alert('No converted file available');
+                return;
+            }
+
+            const url = URL.createObjectURL(convertedBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = convertedFileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         });
 
         // Initialize
