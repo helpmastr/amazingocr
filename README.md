@@ -1,18 +1,16 @@
-# 📄 AmazingOCR | Professional AI-Powered PDF Text Extraction Engine
+# 📟 AmazingSuite | Professional Terminal-Powered Productivity Hub
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=netlify)](https://incandescent-entremet-5aa268.netlify.app/)
 
-**AmazingOCR** is a world-class, high-performance, privacy-first web application designed to **extract text from PDFs** and generate **searchable PDF documents** with **atomic 1000 DPI accuracy**. Supporting over **100+ languages** (including complex **Arabic and English handwriting**), it runs entirely in your browser—ensuring 100% data privacy.
+**AmazingSuite** is a world-class productivity hub designed for high-performance PDF and document workflows. Feature-packed with a stunning **interactive macOS Terminal interface** that serves as the gateway to professional-grade tools.
 
-![Landing Page Screenshot](assets/landing-page.png)
+## ✨ Suite Features
 
-## ✨ Key Features
-
--   **🔒 Privacy-First**: All processing happens locally in your browser using Tesseract.js and PDF-Lib. Your data stays yours.
--   **🌍 Multilingual Support**: Optimized for English, Arabic, and combined text extraction.
--   **⚡ Batch Processing**: Handle up to 10,000 files in a single session with ease.
--   **🖋️ Handwriting Optimization**: Specialized 300 DPI rendering for superior accuracy on handwritten documents.
--   **📂 Flexible Exports**: Download as raw text, searchable PDF, or a bulk ZIP archive.
+-   **🖥️ macOS Terminal Hub**: A high-fidelity simulated terminal for navigating services via commands or visual shortcuts.
+-   **📄 Atomic OCR Engine**: 1000 DPI "Surgical Accuracy" text extraction for 100+ languages, including complex Arabic handwriting.
+-   **🖼️ Image to PDF**: Lightning-fast conversion for JPG/PNG files into high-quality PDF documents.
+-   **🔐 100% Privacy**: Everything runs client-side in your browser. No data ever hits a server.
+-   **🌍 Global Support**: Neural processing for over 100 world languages.
 
 ---
 
