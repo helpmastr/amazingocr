@@ -123,7 +123,27 @@ async function processBatch(files) {
 async function processFile(file) {
     updateProgress(0, `Loading: ${file.name}`);
 
+    const profile = document.getElementById('profile-select').value;
     const arrayBuffer = await file.arrayBuffer();
+    const fileSizeMB = arrayBuffer.byteLength / (1024 * 1024);
+
+    // Auto-optimize for large files to prevent crash
+    let efficientScale = 2.0;
+    if (profile === 'fast') efficientScale = 1.5; // Super Fast
+    else if (profile === 'balanced') efficientScale = 2.5; // Good quality
+    else if (profile === 'hd') efficientScale = 4.0; // High DPI (simulated 1000 DPI effectively) but restricted
+
+    // Safety override for large files
+    if (fileSizeMB > 20 && efficientScale > 2.0) {
+        efficientScale = 2.0;
+        updateProgress(5, `Large file detected (${fileSizeMB.toFixed(1)}MB). Optimizing scale to ${efficientScale}x for safety...`);
+    } else if (fileSizeMB > 50) {
+        efficientScale = 1.5;
+        updateProgress(5, `Heavy file detected (${fileSizeMB.toFixed(1)}MB). Enabling SUPER_FAST mode for stability...`);
+    } else if (profile === 'hd') {
+        updateProgress(5, `High-Fidelity rendering enabled (Scale: ${efficientScale}x)...`);
+    }
+
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const totalPages = pdf.numPages;
 
@@ -131,40 +151,49 @@ async function processFile(file) {
 
     const indices = Array.from({ length: totalPages }, (_, i) => i + 1);
     let completedPages = 0;
-    updateProgress(5, `Preparing ${totalPages} pages for parallel OCR...`);
 
-    // Process pages in parallel using the scheduler
-    const results = await Promise.all(indices.map(async (i) => {
-        const page = await pdf.getPage(i);
+    // Limit concurrency based on file size/profile to save memory
+    const concurrency = (fileSizeMB > 30 || profile === 'hd') ? 1 : 2;
 
-        // Ultra-High-DPI Rendering (14x scale ~ 1000 DPI for atomic accuracy)
-        const viewport = page.getViewport({ scale: 14.0 });
-        const canvas = document.createElement('canvas');
-        const context = canvas.getContext('2d');
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
+    updateProgress(5, `Processing ${totalPages} pages with ${concurrency}x concurrency...`);
 
-        await page.render({ canvasContext: context, viewport: viewport }).promise;
+    // Process pages sequentially or with limited concurrency
+    const results = [];
+    for (let i = 0; i < indices.length; i += concurrency) {
+        const chunk = indices.slice(i, i + concurrency);
+        const chunkResults = await Promise.all(chunk.map(async (pageIndex) => {
+            const page = await pdf.getPage(pageIndex);
 
-        // Apply Super-Accuracy Pre-processing
-        const processedCanvas = preprocessImage(canvas);
+            // Dynamic scaling based on profile/size
+            const viewport = page.getViewport({ scale: efficientScale });
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
 
-        const result = await scheduler.addJob('recognize', processedCanvas, { pdfTitle: `Page ${i}` }, { pdf: true });
+            await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-        // Memory Cleanup: Explicitly clear large canvases
-        canvas.width = 0;
-        canvas.height = 0;
-        if (processedCanvas !== canvas) {
-            processedCanvas.width = 0;
-            processedCanvas.height = 0;
-        }
+            // Apply Super-Accuracy Pre-processing
+            const processedCanvas = preprocessImage(canvas);
 
-        // Update progress as pages complete
-        completedPages++;
-        updateProgress((completedPages / totalPages) * 100, `OCR: Completed ${completedPages}/${totalPages} pages`);
+            const result = await scheduler.addJob('recognize', processedCanvas, { pdfTitle: `Page ${pageIndex}` }, { pdf: true });
 
-        return { index: i, data: result.data };
-    }));
+            // Memory Cleanup: Explicitly clear large canvases
+            canvas.width = 0;
+            canvas.height = 0;
+            if (processedCanvas !== canvas) {
+                processedCanvas.width = 0;
+                processedCanvas.height = 0;
+            }
+
+            // Update progress
+            completedPages++;
+            updateProgress((completedPages / totalPages) * 100, `OCR: Completed ${completedPages}/${totalPages} pages`);
+
+            return { index: pageIndex, data: result.data };
+        }));
+        results.push(...chunkResults);
+    }
 
     // Sort results by index to maintain page order
     results.sort((a, b) => a.index - b.index);
