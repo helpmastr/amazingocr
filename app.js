@@ -131,7 +131,7 @@ async function processFile(file) {
     let efficientScale = 2.0;
     if (profile === 'fast') efficientScale = 1.5; // Super Fast
     else if (profile === 'balanced') efficientScale = 2.5; // Good quality
-    else if (profile === 'hd') efficientScale = 4.0; // High DPI (simulated 1000 DPI effectively) but restricted
+    else if (profile === 'hd') efficientScale = 4.0; // High DPI (simulated 500 DPI effectively) but restricted
 
     // Safety override for large files
     if (fileSizeMB > 20 && efficientScale > 2.0) {

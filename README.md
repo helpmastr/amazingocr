@@ -8,6 +8,18 @@
 
 ---
 
+## 🖥️ Screenshots
+
+| Command Center | Converter Hub |
+|:---:|:---:|
+| ![Index](screenshot_index.png) | ![Hub](screenshot_hub.png) |
+
+| Universal Converter | OCR Engine |
+|:---:|:---:|
+| ![Converter](screenshot_converter.png) | ![OCR](screenshot_ocr.png) |
+
+---
+
 ## 🚀 Features
 
 ### Universal Converter v2
@@ -32,7 +44,7 @@ High-fidelity text extraction with performance profiles:
 
 - **Super Fast** — Optimized for speed
 - **Balanced** — Standard quality
-- **1000 DPI** — Maximum accuracy for small text
+- **500 DPI** — Maximum accuracy for small text
 
 **Features:**
 - Multi-language support (English, Arabic, French, German, Spanish, Japanese)

@@ -4,7 +4,7 @@ const currentInput = document.getElementById('current-input');
 const commands = {
     help: () => `Available commands:<br>
     <span class="terminal-text-blue">/hub</span> - Open Master Converter Hub<br>
-    <span class="terminal-text-blue">/ocr</span> - Launch 1000 DPI OCR Engine<br>
+    <span class="terminal-text-blue">/ocr</span> - Launch 500 DPI OCR Engine<br>
     <span class="terminal-text-blue">/convert</span> - Image to PDF Converter<br>
     <span class="terminal-text-blue">/clear</span> - Clear terminal screen`,
 
@@ -38,7 +38,7 @@ const bootSequence = [
     { text: 'AmazingSuite OS v2.4.0 (AESTHETIC_MODE)', type: 'info' },
     { text: 'Last login: ' + new Date().toLocaleString(), type: 'info' },
     { text: 'Initializing neural network cores... [DONE]', type: 'success' },
-    { text: 'Loading 1000 DPI Atomic OCR modules... [DONE]', type: 'success' },
+    { text: 'Loading 500 DPI Atomic OCR modules... [DONE]', type: 'success' },
     { text: 'System ready. Type <span class="terminal-text-blue">help</span> for available commands.', type: 'info' },
     { text: '----------------------------------------', type: 'info' }
 ];
