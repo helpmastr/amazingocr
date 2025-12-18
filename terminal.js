@@ -3,10 +3,16 @@ const currentInput = document.getElementById('current-input');
 
 const commands = {
     help: () => `Available commands:<br>
+    <span class="terminal-text-blue">/hub</span> - Open Master Converter Hub<br>
     <span class="terminal-text-blue">/ocr</span> - Launch 1000 DPI OCR Engine<br>
     <span class="terminal-text-blue">/convert</span> - Image to PDF Converter<br>
-    <span class="terminal-text-blue">/office</span> - DOCX/Excel Tools (Coming Soon)<br>
     <span class="terminal-text-blue">/clear</span> - Clear terminal screen`,
+
+    '/hub': () => {
+        addLine('Opening Converter Master Hub...', 'info');
+        setTimeout(() => window.location.href = 'hub.html', 1000);
+        return 'Fetching available neural modules...';
+    },
 
     '/ocr': () => {
         addLine('Launching AmazingOCR Neural Engine...', 'info');

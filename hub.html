@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AmazingSuite | Command Center</title>
-    <meta name="description"
-        content="Professional terminal-style suite for OCR, PDF conversion, and digital productivity tools.">
+    <title>AmazingSuite | Converter Hub</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="terminal.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,29 +15,51 @@
 
 <body class="terminal-body">
     <div class="terminal-container">
-        <!-- macOS Window Frame -->
         <div class="terminal-window">
             <div class="terminal-header">
                 <div class="window-controls">
-                    <span class="control close"></span>
+                    <span class="control close" onclick="window.location.href='index.html'"></span>
                     <span class="control minimize"></span>
                     <span class="control maximize"></span>
                 </div>
                 <div class="terminal-title">
-                    <i data-lucide="terminal" size="14"></i> af — amazing-suite — zsh
+                    <i data-lucide="layout-grid" size="14"></i> af — master-hub — all-converters
                 </div>
             </div>
 
-            <div id="terminal-content" class="terminal-content">
-                <div id="output"></div>
-                <div class="input-line">
-                    <span class="prompt">af@helpmastr ~ %</span>
-                    <span id="current-input"></span>
-                    <span class="cursor"></span>
+            <div class="terminal-content">
+                <div style="margin-bottom: 25px;">
+                    <h2 class="terminal-text-green">> CONVERTER_MASTER_LIST</h2>
+                    <p class="terminal-text-muted">Select a neural module to begin processing.</p>
+                </div>
+
+                <div class="hub-grid">
+                    <div class="hub-card" onclick="window.location.href='engine.html'">
+                        <i data-lucide="scan-text" size="32"></i>
+                        <h4>Atomic OCR</h4>
+                        <p>1000 DPI Text Extraction</p>
+                    </div>
+
+                    <div class="hub-card" onclick="window.location.href='converter.html'">
+                        <i data-lucide="file-type" size="32"></i>
+                        <h4>Image to PDF</h4>
+                        <p>JPG/PNG Transformer</p>
+                    </div>
+
+                    <div class="hub-card disabled">
+                        <i data-lucide="file-spreadsheet" size="32"></i>
+                        <h4>Excel Engine</h4>
+                        <p>Data Connector (Coming Soon)</p>
+                    </div>
+
+                    <div class="hub-card disabled">
+                        <i data-lucide="file-text" size="32"></i>
+                        <h4>DOCX Suite</h4>
+                        <p>Office Importer (Coming Soon)</p>
+                    </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <!-- macOS Dock -->
@@ -58,12 +78,8 @@
             <i data-lucide="github"></i>
         </div>
     </div>
-    </div>
 
-    <script src="terminal.js"></script>
-    <script>
-        lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>
