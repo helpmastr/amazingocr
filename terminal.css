@@ -2,7 +2,7 @@
     --terminal-bg: rgba(28, 28, 30, 0.85);
     --terminal-header: #3a3a3c;
     --terminal-text: #00ff41;
-    /* Classic Matrix Green */
+    /* Matrix Green */
     --terminal-prompt: #50fa7b;
     --terminal-font: 'JetBrains Mono', monospace;
 }
@@ -32,6 +32,8 @@
     backdrop-filter: blur(20px);
     overflow: hidden;
     animation: windowEntry 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes windowEntry {
@@ -53,6 +55,7 @@
     align-items: center;
     padding: 0 15px;
     position: relative;
+    flex-shrink: 0;
 }
 
 .window-controls {
@@ -64,6 +67,7 @@
     width: 12px;
     height: 12px;
     border-radius: 50%;
+    cursor: pointer;
 }
 
 .close {
@@ -94,11 +98,25 @@
 
 .terminal-content {
     padding: 20px;
-    height: 400px;
+    flex: 1;
     overflow-y: auto;
     color: #fff;
     font-size: 14px;
     line-height: 1.6;
+}
+
+/* Scrollbar Styling */
+.terminal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 .prompt {
@@ -126,41 +144,75 @@
     }
 }
 
-.suite-shortcuts {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-.shortcut-item {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 15px 25px;
+/* UI Elements */
+.terminal-dropzone {
+    border: 2px dashed rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    color: #fff;
+    padding: 40px 20px;
+    text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
-    min-width: 120px;
+    background: rgba(255, 255, 255, 0.02);
 }
 
-.shortcut-item:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-5px);
+.terminal-dropzone:hover {
     border-color: var(--terminal-prompt);
+    background: rgba(80, 250, 123, 0.05);
 }
 
-.shortcut-item i {
+.terminal-button-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.terminal-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: var(--terminal-font);
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.terminal-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--terminal-prompt);
+    transform: translateY(-2px);
+}
+
+.terminal-btn.primary {
+    background: rgba(80, 250, 123, 0.1);
+    border-color: var(--terminal-prompt);
     color: var(--terminal-prompt);
 }
 
-.shortcut-item.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
+.terminal-input,
+.terminal-select {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: var(--terminal-font);
+    font-size: 13px;
+    outline: none;
+}
+
+.terminal-input:focus,
+.terminal-select:focus {
+    border-color: var(--terminal-prompt);
+}
+
+.terminal-text-muted {
+    color: #888;
 }
 
 .terminal-text-green {
@@ -173,4 +225,8 @@
 
 .terminal-text-yellow {
     color: #ebcb8b;
+}
+
+.terminal-text-red {
+    color: #ff5f56;
 }

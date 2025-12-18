@@ -4,236 +4,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AmazingOCR | Professional AI-Powered PDF Text Extraction</title>
-    <meta name="description"
-        content="Extract text from PDFs with atomic 1000 DPI accuracy. Support for 100+ languages including Arabic and English handwriting. 100% browser-based and privacy-first.">
-    <meta name="keywords"
-        content="OCR, PDF to Text, Arabic OCR, Handwriting Recognition, Privacy-First OCR, Browser OCR, Tesseract.js, helpmastr">
-    <meta name="author" content="helpmastr">
-
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://incandescent-entremet-5aa268.netlify.app/">
-    <meta property="og:title" content="AmazingOCR | 1000 DPI Atomic Accuracy OCR">
-    <meta property="og:description"
-        content="World-class PDF text extraction for 100+ languages. Fast, private, and powerful.">
-    <meta property="og:image" content="https://github.com/helpmastr/amazingocr/raw/main/assets/landing-page.png">
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://incandescent-entremet-5aa268.netlify.app/">
-    <meta property="twitter:title" content="AmazingOCR | AI PDF Engine">
-    <meta property="twitter:description"
-        content="1000 DPI atomic accuracy for Arabic & English handwriting. 100% private.">
-    <meta property="twitter:image" content="https://github.com/helpmastr/amazingocr/raw/main/assets/landing-page.png">
+    <title>AmazingSuite | 1000 DPI OCR Engine</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="terminal.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap"
-        rel="stylesheet">
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- pdf.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- Tesseract.js -->
-    <script src="https://unpkg.com/tesseract.js@v5.0.2/dist/tesseract.min.js"></script>
-    <!-- pdf-lib -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/tesseract.js@v5.0.3/dist/tesseract.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-    <!-- JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<body>
-    <div class="container animate-fade-in">
-        <header>
-            <h1>AmazingOCR</h1>
-            <p>Extract text or generate searchable PDFs, entirely in your browser.</p>
-        </header>
-
-        <main class="glass-card">
-            <!-- Dropzone -->
-            <div id="dropzone" class="dropzone">
-                <div class="dropzone-content">
-                    <i data-lucide="upload-cloud"></i>
-                    <h3>Drop your PDFs here</h3>
-                    <p>or click to browse (up to 10,000 files)</p>
+<body class="terminal-body">
+    <div class="terminal-container">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="window-controls">
+                    <span class="control close" onclick="window.location.href='index.html'"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
                 </div>
-                <div class="dropzone-options" onclick="event.stopPropagation()">
-                    <div class="option-group">
-                        <label for="language-select">OCR Language</label>
-                        <select id="language-select" class="select-input">
-                            <option value="eng">English</option>
-                            <option value="ara">Arabic (العربية)</option>
-                            <option value="eng+ara">English + Arabic</option>
-                            <option disabled>──────────</option>
-                            <option value="afr">Afrikaans</option>
-                            <option value="amh">Amharic</option>
-                            <option value="asm">Assamese</option>
-                            <option value="aze">Azerbaijani</option>
-                            <option value="aze_cyrl">Azerbaijani (Cyrillic)</option>
-                            <option value="bel">Belarusian</option>
-                            <option value="ben">Bengali</option>
-                            <option value="bod">Tibetan</option>
-                            <option value="bos">Bosnian</option>
-                            <option value="bul">Bulgarian</option>
-                            <option value="cat">Catalan; Valencian</option>
-                            <option value="ceb">Cebuano</option>
-                            <option value="ces">Czech</option>
-                            <option value="chi_sim">Chinese - Simplified</option>
-                            <option value="chi_tra">Chinese - Traditional</option>
-                            <option value="chr">Cherokee</option>
-                            <option value="cym">Welsh</option>
-                            <option value="dan">Danish</option>
-                            <option value="deu">German</option>
-                            <option value="dzo">Dzongkha</option>
-                            <option value="ell">Greek, Modern (1453-)</option>
-                            <option value="enm">English, Middle (1100-1500)</option>
-                            <option value="epo">Esperanto</option>
-                            <option value="est">Estonian</option>
-                            <option value="eus">Basque</option>
-                            <option value="fas">Persian</option>
-                            <option value="fin">Finnish</option>
-                            <option value="fra">French</option>
-                            <option value="frk">Frankish</option>
-                            <option value="frm">French, Middle (ca.1400-1600)</option>
-                            <option value="gle">Irish</option>
-                            <option value="glg">Galician</option>
-                            <option value="grc">Greek, Ancient (to 1453)</option>
-                            <option value="guj">Gujarati</option>
-                            <option value="hat">Haitian; Haitian Creole</option>
-                            <option value="heb">Hebrew</option>
-                            <option value="hin">Hindi</option>
-                            <option value="hrv">Croatian</option>
-                            <option value="hun">Hungarian</option>
-                            <option value="iku">Inuktitut</option>
-                            <option value="ind">Indonesian</option>
-                            <option value="isl">Icelandic</option>
-                            <option value="ita">Italian</option>
-                            <option value="ita_old">Italian - Old</option>
-                            <option value="jav">Javanese</option>
-                            <option value="jpn">Japanese</option>
-                            <option value="kan">Kannada</option>
-                            <option value="kat">Georgian</option>
-                            <option value="kat_old">Georgian - Old</option>
-                            <option value="kaz">Kazakh</option>
-                            <option value="khm">Khmer Central</option>
-                            <option value="kir">Kirghiz; Kyrgyz</option>
-                            <option value="kor">Korean</option>
-                            <option value="kur">Kurdish</option>
-                            <option value="lao">Lao</option>
-                            <option value="lat">Latin</option>
-                            <option value="lav">Latvian</option>
-                            <option value="lit">Lithuanian</option>
-                            <option value="mal">Malayalam</option>
-                            <option value="mar">Marathi</option>
-                            <option value="mkd">Macedonian</option>
-                            <option value="mlt">Maltese</option>
-                            <option value="msa">Malay</option>
-                            <option value="mya">Burmese</option>
-                            <option value="nep">Nepali</option>
-                            <option value="nld">Dutch; Flemish</option>
-                            <option value="nor">Norwegian</option>
-                            <option value="ori">Oriya</option>
-                            <option value="pan">Panjabi; Punjabi</option>
-                            <option value="pol">Polish</option>
-                            <option value="por">Portuguese</option>
-                            <option value="pus">Pushto; Pashto</option>
-                            <option value="ron">Romanian; Moldavian; Moldovan</option>
-                            <option value="rus">Russian</option>
-                            <option value="san">Sanskrit</option>
-                            <option value="sin">Sinhala; Sinhalese</option>
-                            <option value="slk">Slovak</option>
-                            <option value="slv">Slovenian</option>
-                            <option value="spa">Spanish; Castilian</option>
-                            <option value="spa_old">Spanish; Castilian - Old</option>
-                            <option value="sqi">Albanian</option>
-                            <option value="srp">Serbian</option>
-                            <option value="srp_latn">Serbian - Latin</option>
-                            <option value="swa">Swahili</option>
-                            <option value="swe">Swedish</option>
-                            <option value="syr">Syriac</option>
-                            <option value="tam">Tamil</option>
-                            <option value="tel">Telugu</option>
-                            <option value="tgk">Tajik</option>
-                            <option value="tgl">Tagalog</option>
-                            <option value="tha">Thai</option>
-                            <option value="tir">Tigrinya</option>
-                            <option value="tur">Turkish</option>
-                            <option value="uig">Uighur; Uyghur</option>
-                            <option value="ukr">Ukrainian</option>
-                            <option value="urd">Urdu</option>
-                            <option value="uzb">Uzbek</option>
-                            <option value="uzb_cyrl">Uzbek - Cyrillic</option>
-                            <option value="vie">Vietnamese</option>
-                            <option value="yid">Yiddish</option>
-                        </select>
-                    </div>
+                <div class="terminal-title">
+                    <i data-lucide="scan-text" size="14"></i> af — ocr-engine — 1000 DPI
                 </div>
-                <input type="file" id="file-input" accept="application/pdf" multiple>
-            </div>
-            <p class="optimization-note">
-                <i data-lucide="zap" size="14"></i> Atomic Accuracy: 1000 DPI + Neural Parallel Processing
-            </p>
-
-            <!-- Status & Progress -->
-            <div id="status-section" class="status-section">
-                <div id="batch-progress-container" class="batch-progress-info" style="display: none;">
-                    <div class="status-text">
-                        <span>Batch Progress</span>
-                        <span id="batch-progress-text">0 / 0 Files</span>
-                    </div>
-                    <div class="progress-container mini">
-                        <div id="batch-progress-bar"></div>
-                    </div>
-                </div>
-
-                <div class="status-text">
-                    <span id="status-label">Initializing...</span>
-                    <span id="progress-percent">0%</span>
-                </div>
-                <div class="progress-container">
-                    <div id="progress-bar"></div>
-                </div>
-                <p id="page-info" style="font-size: 0.8rem; color: var(--text-muted);"></p>
             </div>
 
-            <!-- Results -->
-            <div id="results-section" class="results-section">
-                <div class="results-header">
-                    <h3>Extracted Content</h3>
-                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button id="copy-btn" class="btn btn-ghost">
-                            <i data-lucide="copy" size="18"></i> Copy Text
-                        </button>
-                        <button id="download-txt-btn" class="btn btn-ghost">
-                            <i data-lucide="file-text" size="18"></i> Text
-                        </button>
-                        <button id="download-pdf-btn" class="btn btn-ghost">
-                            <i data-lucide="file-check" size="18"></i> Searchable PDF
-                        </button>
-                        <button id="download-zip-btn" class="btn btn-primary" style="display: none;">
-                            <i data-lucide="archive" size="18"></i> Download All (ZIP)
-                        </button>
+            <div class="terminal-content" style="height: 500px;">
+                <!-- Main View -->
+                <div id="dropzone-view">
+                    <div id="dropzone" class="terminal-dropzone">
+                        <i data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
+                        <h3 style="margin: 15px 0 5px;">DRIVE_MOUNT_READY</h3>
+                        <p class="terminal-text-muted">Drop PDFs here for atomic-level extraction</p>
+
+                        <div class="terminal-button-group" style="justify-content: center; margin-top: 25px;"
+                            onclick="event.stopPropagation()">
+                            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                                <label
+                                    style="font-size: 11px; color: #888; margin-bottom: 5px;">SELECT_ENGINE_LANGUAGE:</label>
+                                <select id="language-select" class="terminal-select">
+                                    <option value="eng">English</option>
+                                    <option value="ara">Arabic (العربية)</option>
+                                    <option value="eng+ara">Combined (EN+AR)</option>
+                                    <option disabled>──────────</option>
+                                    <option value="fra">French</option>
+                                    <option value="deu">German</option>
+                                    <option value="spa">Spanish</option>
+                                    <option value="jpn">Japanese</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <textarea id="results-area" class="results-area" readonly></textarea>
-                <button id="reset-btn" class="btn btn-ghost"
-                    style="margin-top: 1rem; width: 100%; justify-content: center;">
-                    <i data-lucide="refresh-cw" size="18"></i> Process Another File
-                </button>
+                <input type="file" id="file-input" accept="application/pdf" multiple style="display: none;">
+
+                <!-- Progress View -->
+                <div id="status-section" style="display: none; padding: 20px 0;">
+                    <div id="batch-progress-container" style="margin-bottom: 25px;">
+                        <div
+                            style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+                            <span class="terminal-text-blue">BATCH_TASK_PROGRESS:</span>
+                            <span id="batch-progress-text">0 / 0 FILES</span>
+                        </div>
+                        <div class="progress-container mini">
+                            <div id="batch-progress-bar"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px;">
+                        <span id="status-label" class="terminal-text-green">INITIALIZING_NEURAL_CORES...</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-container">
+                        <div id="progress-bar"></div>
+                    </div>
+                    <p id="page-info" class="terminal-text-muted"
+                        style="font-size: 12px; margin-top: 15px; font-style: italic;"></p>
+                </div>
+
+                <!-- Results View -->
+                <div id="results-section" style="display: none; flex-direction: column; height: 100%;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <span class="terminal-text-green">> EXTRACTION_COMPLETE</span>
+                        <span class="terminal-text-muted" style="font-size: 11px;">Buffer: Read-only</span>
+                    </div>
+                    <textarea id="results-area" readonly class="terminal-input"
+                        style="flex: 1; min-height: 250px; resize: none; font-size: 12px; color: #ccc;"></textarea>
+
+                    <div class="terminal-button-group">
+                        <button id="copy-btn" class="terminal-btn"><i data-lucide="copy" size="14"></i> COPY</button>
+                        <button id="download-txt-btn" class="terminal-btn"><i data-lucide="file-text" size="14"></i>
+                            TXT</button>
+                        <button id="download-pdf-btn" class="terminal-btn primary"><i data-lucide="file-check"
+                                size="14"></i> SEARCHABLE_PDF</button>
+                        <button id="download-zip-btn" class="terminal-btn primary"><i data-lucide="archive"
+                                size="14"></i> BATCH_ZIP</button>
+                        <button id="reset-btn" class="terminal-btn" style="margin-left: auto;"><i
+                                data-lucide="refresh-cw" size="14"></i> NEW_TASK</button>
+                    </div>
+                </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <footer>
-        <p>&copy; 2025 AmazingOCR. No files leave your browser. Privacy first.</p>
-    </footer>
-
     <script src="app.js"></script>
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
+    <script>lucide.createIcons();</script>
 </body>
 
 </html>
