@@ -1,6 +1,6 @@
 # 📄 AmazingOCR | Professional PDF Text Extraction
 
-[![GitHub Pages](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=github)](https://afamazing.github.io/amazingocr/)
+[![GitHub Pages](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=github)](https://helpmastr.github.io/amazingocr/)
 
 **AmazingOCR** is a high-performance, privacy-first web application that extracts text from PDFs and generates searchable PDF documents—all entirely within your browser. No files ever leave your machine.
 
@@ -28,7 +28,7 @@
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/afamazing/amazingocr.git
+   git clone https://github.com/helpmastr/amazingocr.git
    ```
 2. **Navigate to the directory**:
    ```bash
@@ -44,7 +44,7 @@
 1. Push your code to a GitHub repository (done!).
 2. Go to **Settings > Pages** in your GitHub repository.
 3. Under **Branch**, select `main` and `/ (root)`.
-4. Click **Save**. Your site will be live at `https://afamazing.github.io/amazingocr/` in a few minutes!
+4. Click **Save**. Your site will be live at `https://helpmastr.github.io/amazingocr/` in a few minutes!
 
 ---
 
