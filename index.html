@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmazingOCR | Professional PDF Text Extraction</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Fira+Code&display=swap"
+        rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <!-- Tesseract.js -->
+    <script src="https://unpkg.com/tesseract.js@v5.0.2/dist/tesseract.min.js"></script>
+    <!-- pdf-lib -->
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <!-- JSZip -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+    <div class="container animate-fade-in">
+        <header>
+            <h1>AmazingOCR</h1>
+            <p>Extract text or generate searchable PDFs, entirely in your browser.</p>
+        </header>
+
+        <main class="glass-card">
+            <!-- Dropzone -->
+            <div id="dropzone" class="dropzone">
+                <div class="dropzone-content">
+                    <i data-lucide="upload-cloud"></i>
+                    <h3>Drop your PDFs here</h3>
+                    <p>or click to browse (up to 10,000 files)</p>
+                </div>
+                <div class="dropzone-options" onclick="event.stopPropagation()">
+                    <div class="option-group">
+                        <label for="language-select">OCR Language</label>
+                        <select id="language-select" class="select-input">
+                            <option value="eng">English (Standard)</option>
+                            <option value="ara">Arabic (العربية)</option>
+                            <option value="eng+ara">Combined (English + Arabic)</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="file" id="file-input" accept="application/pdf" multiple>
+            </div>
+            <p class="optimization-note">
+                <i data-lucide="zap" size="14"></i> Handwriting optimization enabled (300 DPI Rendering)
+            </p>
+
+            <!-- Status & Progress -->
+            <div id="status-section" class="status-section">
+                <div id="batch-progress-container" class="batch-progress-info" style="display: none;">
+                    <div class="status-text">
+                        <span>Batch Progress</span>
+                        <span id="batch-progress-text">0 / 0 Files</span>
+                    </div>
+                    <div class="progress-container mini">
+                        <div id="batch-progress-bar"></div>
+                    </div>
+                </div>
+
+                <div class="status-text">
+                    <span id="status-label">Initializing...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div id="progress-bar"></div>
+                </div>
+                <p id="page-info" style="font-size: 0.8rem; color: var(--text-muted);"></p>
+            </div>
+
+            <!-- Results -->
+            <div id="results-section" class="results-section">
+                <div class="results-header">
+                    <h3>Extracted Content</h3>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button id="copy-btn" class="btn btn-ghost">
+                            <i data-lucide="copy" size="18"></i> Copy Text
+                        </button>
+                        <button id="download-txt-btn" class="btn btn-ghost">
+                            <i data-lucide="file-text" size="18"></i> Text
+                        </button>
+                        <button id="download-pdf-btn" class="btn btn-ghost">
+                            <i data-lucide="file-check" size="18"></i> Searchable PDF
+                        </button>
+                        <button id="download-zip-btn" class="btn btn-primary" style="display: none;">
+                            <i data-lucide="archive" size="18"></i> Download All (ZIP)
+                        </button>
+                    </div>
+                </div>
+                <textarea id="results-area" class="results-area" readonly></textarea>
+                <button id="reset-btn" class="btn btn-ghost"
+                    style="margin-top: 1rem; width: 100%; justify-content: center;">
+                    <i data-lucide="refresh-cw" size="18"></i> Process Another File
+                </button>
+            </div>
+        </main>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 AmazingOCR. No files leave your browser. Privacy first.</p>
+    </footer>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
