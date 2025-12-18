@@ -1,7 +1,6 @@
 # 📄 AmazingOCR | Professional PDF Text Extraction
 
 [![GitHub Pages](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=github)](https://afamazing.github.io/amazingocr/)
-[![Netlify Status](https://img.shields.io/badge/Deploy-Netlify-00AD9F?style=for-the-badge&logo=netlify)](https://app.netlify.com/)
 
 **AmazingOCR** is a high-performance, privacy-first web application that extracts text from PDFs and generates searchable PDF documents—all entirely within your browser. No files ever leave your machine.
 
@@ -42,15 +41,10 @@
 ## 🌐 Deployment
 
 ### 🐙 GitHub Pages
-1. Push your code to a GitHub repository.
-2. Go to **Settings > Pages**.
-3. Select the `main` branch and `/root` (or `/docs`) folder as the build source.
-4. Hit **Save**. Your site will be live in minutes!
-
-### 🌍 Netlify
-Included in this repo is a `netlify.toml` for easy deployment.
-1. Connect your repo to Netlify.
-2. The configuration handles the rest!
+1. Push your code to a GitHub repository (done!).
+2. Go to **Settings > Pages** in your GitHub repository.
+3. Under **Branch**, select `main` and `/ (root)`.
+4. Click **Save**. Your site will be live at `https://afamazing.github.io/amazingocr/` in a few minutes!
 
 ---
 
