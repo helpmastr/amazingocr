@@ -1,8 +1,8 @@
-# 📄 AmazingOCR | Professional PDF Text Extraction
+# 📄 AmazingOCR | Professional AI-Powered PDF Text Extraction Engine
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=netlify)](https://incandescent-entremet-5aa268.netlify.app/)
 
-**AmazingOCR** is a high-performance, privacy-first web application that extracts text from PDFs and generates searchable PDF documents—all entirely within your browser. No files ever leave your machine.
+**AmazingOCR** is a world-class, high-performance, privacy-first web application designed to **extract text from PDFs** and generate **searchable PDF documents** with **atomic 1000 DPI accuracy**. Supporting over **100+ languages** (including complex **Arabic and English handwriting**), it runs entirely in your browser—ensuring 100% data privacy.
 
 ![Landing Page Screenshot](assets/landing-page.png)
 
