@@ -19,8 +19,8 @@
 }
 
 .terminal-container {
-    width: 90%;
-    max-width: 900px;
+    width: 95%;
+    max-width: 1000px;
     perspective: 1000px;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .terminal-content {
-    padding: 20px;
+    padding: 24px;
     flex: 1;
     overflow-y: auto;
     color: #fff;
@@ -118,27 +118,107 @@
     border-radius: 4px;
 }
 
+/* Hub Categorization */
+.hub-section {
+    margin-bottom: 35px;
+}
+
+.hub-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hub-section-header i {
+    color: #51afef;
+}
+
+.hub-section-header span {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: #888;
+}
+
+.hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.hub-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 18px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hub-card:hover:not(.disabled) {
+    background: rgba(80, 250, 123, 0.08);
+    border-color: var(--terminal-prompt);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.hub-card.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+.hub-card i {
+    color: var(--terminal-prompt);
+    transition: transform 0.3s;
+}
+
+.hub-card:hover:not(.disabled) i {
+    transform: scale(1.1);
+}
+
+.hub-card h4 {
+    margin: 0;
+    font-size: 15px;
+    color: #fff;
+    font-weight: 600;
+}
+
+.hub-card p {
+    margin: 0;
+    font-size: 11px;
+    color: #888;
+}
+
 /* macOS Dock */
 .terminal-dock {
     position: fixed;
-    bottom: 20px;
+    bottom: 25px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(20px);
-    padding: 10px 15px;
-    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(25px);
+    padding: 12px 18px;
+    border-radius: 22px;
     display: flex;
-    gap: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    gap: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
     z-index: 1000;
     animation: dockRise 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes dockRise {
     from {
-        transform: translate(-50%, 100px);
+        transform: translate(-50%, 120px);
         opacity: 0;
     }
 
@@ -149,10 +229,10 @@
 }
 
 .dock-item {
-    width: 50px;
-    height: 50px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    width: 54px;
+    height: 54px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -163,9 +243,10 @@
 }
 
 .dock-item:hover {
-    transform: scale(1.4) translateY(-10px);
-    background: rgba(255, 255, 255, 0.15);
-    margin: 0 10px;
+    transform: scale(1.4) translateY(-12px);
+    background: rgba(255, 255, 255, 0.18);
+    margin: 0 12px;
+    z-index: 1001;
 }
 
 .dock-item i {
@@ -175,81 +256,29 @@
 .dock-item::after {
     content: attr(data-label);
     position: absolute;
-    top: -40px;
-    background: rgba(0, 0, 0, 0.8);
+    top: -45px;
+    background: rgba(0, 0, 0, 0.85);
     color: #fff;
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-size: 11px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: bold;
     white-space: nowrap;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
 }
 
 .dock-item:hover::after {
     opacity: 1;
 }
 
-/* Hub Grid */
-.hub-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 20px;
-    padding: 10px;
-}
-
-.hub-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    padding: 25px;
-    border-radius: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.hub-card:hover {
-    background: rgba(80, 250, 123, 0.05);
-    border-color: var(--terminal-prompt);
-    transform: translateY(-5px);
-}
-
-.hub-card.disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.hub-card.disabled:hover {
-    transform: none;
-    border-color: rgba(255, 255, 255, 0.08);
-}
-
-.hub-card i {
-    color: var(--terminal-prompt);
-}
-
-.hub-card h4 {
-    margin: 0;
-    font-size: 14px;
-    color: #fff;
-}
-
-.hub-card p {
-    margin: 0;
-    font-size: 11px;
-    color: #888;
-}
-
 /* Global UI Elements */
 .terminal-dropzone {
     border: 2px dashed rgba(255, 255, 255, 0.1);
     border-radius: 12px;
-    padding: 40px 20px;
+    padding: 45px 25px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -265,46 +294,53 @@
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 25px;
 }
 
 .terminal-btn {
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #fff;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 12px 22px;
+    border-radius: 10px;
     font-family: var(--terminal-font);
     font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
+    gap: 10px;
+    transition: all 0.25s;
 }
 
-.terminal-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+.terminal-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12);
     border-color: var(--terminal-prompt);
     transform: translateY(-2px);
 }
 
 .terminal-btn.primary {
-    background: rgba(80, 250, 123, 0.1);
+    background: rgba(80, 250, 123, 0.12);
     border-color: var(--terminal-prompt);
     color: var(--terminal-prompt);
 }
 
 .terminal-input,
 .terminal-select {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     color: #fff;
-    padding: 8px 12px;
-    border-radius: 6px;
+    padding: 10px 14px;
+    border-radius: 8px;
     font-family: var(--terminal-font);
-    font-size: 13px;
+    font-size: 14px;
     outline: none;
+    transition: border-color 0.2s;
+}
+
+.terminal-input:focus,
+.terminal-select:focus {
+    border-color: var(--terminal-prompt);
 }
 
 .terminal-text-muted {

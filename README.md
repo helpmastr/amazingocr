@@ -1,71 +1,85 @@
-# 📟 AmazingSuite | Professional Terminal-Powered Productivity Hub
+# AmazingSuite - OCR & Converter Engine (v2.0)
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge&logo=netlify)](https://incandescent-entremet-5aa268.netlify.app/)
+> **Terminal-Themed Productivity Suite** for high-efficiency document processing.
 
-**AmazingSuite** is a world-class productivity hub designed for high-performance PDF and document workflows. Feature-packed with a stunning **interactive macOS Terminal interface** that serves as the gateway to professional-grade tools.
+![Banner](https://img.shields.io/badge/Status-Active-success?style=for-the-badge) ![Version](https://img.shields.io/badge/Version-2.0.0-blue?style=for-the-badge)
 
-## ✨ Suite Features
+**AmazingSuite** is a web-based toolkit designed with a premium **hacker/terminal aesthetic**. It provides local-first tools for OCR, file conversion, and document management without needing a backend for most operations.
 
--   **🖥️ macOS Terminal Hub**: A high-fidelity simulated terminal for navigating services via commands or visual shortcuts.
--   **📄 Atomic OCR Engine**: 1000 DPI "Surgical Accuracy" text extraction for 100+ languages, including complex Arabic handwriting.
--   **🖼️ Image to PDF**: Lightning-fast conversion for JPG/PNG files into high-quality PDF documents.
--   **🔐 100% Privacy**: Everything runs client-side in your browser. No data ever hits a server.
--   **🌍 Global Support**: Neural processing for over 100 world languages.
+## 🖥️ Interface Preview
 
----
+| **Command Center** | **Converter Hub** |
+|:---:|:---:|
+| ![Home](screenshot_index.png) | ![Hub](screenshot_hub.png) |
+| *Central navigation dashboard* | *12+ Conversion Modules* |
 
-
-## 🚀 Getting Started
-
-### 📦 Prerequisites
-
--   A modern web browser (Chrome, Firefox, Safari, or Edge).
--   A local web server (optional, for local development).
-
-### 🛠️ Running Locally
-
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/helpmastr/amazingocr.git
-   ```
-2. **Navigate to the directory**:
-   ```bash
-   cd amazingocr
-   ```
-3. **Open `index.html`** in your browser, or serve it using a tool like Live Server.
+| **Universal Converter** | **OCR Engine** |
+|:---:|:---:|
+| ![Universal Converter](screenshot_universal.png) | ![OCR](screenshot_engine.png) |
+| *Unified Terminal Processing Engine* | *1000 DPI Text Extraction* |
 
 ---
 
-## 🌐 Deployment
+## 🚀 Features
 
-### 🐙 GitHub Pages
-1. Push your code to a GitHub repository (done!).
-2. Go to **Settings > Pages** in your GitHub repository.
-3. Under **Branch**, select `main` and `/ (root)`.
-4. Click **Save**. Your site will be live at `https://helpmastr.github.io/amazingocr/`!
+### 1. **Universal Converter Engine**
+A unified, terminal-styled interface handling **12 conversion modes**:
 
-### 🌍 Netlify (Primary)
-The project is currently deployed at:
-**[https://incandescent-entremet-5aa268.netlify.app/](https://incandescent-entremet-5aa268.netlify.app/)**
+*   **📄 Documents**:
+    *   `PDF ↔ Word` (DOCX Exporter)
+    *   `PDF ↔ Excel` (Table Extraction)
+    *   `PDF ↔ PPT` (Slide Generation)
+    *   `PDF ↔ Text` (Raw Extraction)
+*   **🖼️ Images**:
+    *   `Image ↔ PDF` (Batch Combination)
+    *   `HEIC ↔ JPG` (iPhone Native Support)
+    *   `JPG ↔ PNG` (Alpha Transparency)
+    *   `WebP ↔ All` (Web Optimization)
+*   **🎬 Video/Audio**:
+    *   `MP4 ↔ MP3` (Audio Extraction)
+    *   `MOV ↔ MP4` (Standardization)
+    *   `WAV ↔ All` (Lossless Conversion)
+*   **📚 E-Books**:
+    *   `EPUB ↔ PDF` (Reader Sync)
+    *   `MOBI ↔ EPUB` (Kindle Native)
+
+### 2. **Atomic OCR Engine**
+*   **1000 DPI Scanning**: High-fidelity text extraction using Tesseract.js.
+*   **Live Preview**: Real-time canvas rendering of uploaded documents.
+*   **Confidence Scoring**: Terminal-style output of recognition confidence.
+
+### 3. **Terminal Aesthetic**
+*   **Matrix Green** typography & glowing CRT effects.
+*   **Simulated CLI Logging**: "Running Transcode WASP v2.4..."
+*   **Glassmorphism**: Modern frosted glass UI elements over a dark background.
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠️ Installation
 
--   **Core**: HTML5, Vanilla CSS, JavaScript (ES6+)
--   **OCR Engine**: [Tesseract.js](https://tesseract.projectnaptha.com/)
--   **PDF Manipulation**: [PDF-Lib](https://pdf-lib.js.org/)
--   **UI Icons**: [Lucide](https://lucide.dev/)
--   **Rendering**: [PDF.js](https://mozilla.github.io/pdf.js/)
+Simply clone the repository and open `index.html` in any modern browser. No server required!
+
+```bash
+git clone https://github.com/helpmastr/amazingocr.git
+cd amazingocr
+open index.html
+```
+
+## ⌨️ Shortcuts
+
+*   `Cmd/Ctrl + O`: Open File
+*   `Cmd/Ctrl + S`: Save Result
 
 ---
 
-## 📜 License
+## 🤝 Contributing
 
-MIT License. Feel free to use and modify for your own projects!
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
 ---
 
-<p align="center">
-  Made with ❤️ for Privacy and Productivity.
-</p>
+> Built with ❤️ by **af** using Vanilla JS, PDF-Lib, and Tesseract.js.

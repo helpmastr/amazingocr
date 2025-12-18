@@ -27,37 +27,122 @@
                 </div>
             </div>
 
-            <div class="terminal-content">
+            <div class="terminal-content" style="height: 550px;">
                 <div style="margin-bottom: 25px;">
-                    <h2 class="terminal-text-green">> CONVERTER_MASTER_LIST</h2>
-                    <p class="terminal-text-muted">Select a neural module to begin processing.</p>
+                    <h2 class="terminal-text-green">> CONVERTER_MASTER_CATALOG</h2>
+                    <p class="terminal-text-muted">Select a processing module from the categories below.</p>
                 </div>
 
-                <div class="hub-grid">
-                    <div class="hub-card" onclick="window.location.href='engine.html'">
-                        <i data-lucide="scan-text" size="32"></i>
-                        <h4>Atomic OCR</h4>
-                        <p>1000 DPI Text Extraction</p>
+                <!-- Documents -->
+                <div class="hub-section">
+                    <div class="hub-section-header">
+                        <i data-lucide="file-text" size="16"></i>
+                        <span>DOCUMENTS</span>
                     </div>
-
-                    <div class="hub-card" onclick="window.location.href='converter.html'">
-                        <i data-lucide="file-type" size="32"></i>
-                        <h4>Image to PDF</h4>
-                        <p>JPG/PNG Transformer</p>
-                    </div>
-
-                    <div class="hub-card disabled">
-                        <i data-lucide="file-spreadsheet" size="32"></i>
-                        <h4>Excel Engine</h4>
-                        <p>Data Connector (Coming Soon)</p>
-                    </div>
-
-                    <div class="hub-card disabled">
-                        <i data-lucide="file-text" size="32"></i>
-                        <h4>DOCX Suite</h4>
-                        <p>Office Importer (Coming Soon)</p>
+                    <div class="hub-grid">
+                        <div class="hub-card" onclick="window.location.href='engine.html'">
+                            <i data-lucide="scan-text" size="24"></i>
+                            <h4>Atomic OCR</h4>
+                            <p>1000 DPI Extract</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=pdf-word'">
+                            <i data-lucide="file-check" size="24"></i>
+                            <h4>PDF ↔ Word</h4>
+                            <p>DOCX Exporter</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=pdf-excel'">
+                            <i data-lucide="file-spreadsheet" size="24"></i>
+                            <h4>PDF ↔ Excel</h4>
+                            <p>Data Table Ext</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=pdf-ppt'">
+                            <i data-lucide="presentation" size="24"></i>
+                            <h4>PDF ↔ PPT</h4>
+                            <p>Slides Master</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=pdf-text'">
+                            <i data-lucide="file-type-2" size="24"></i>
+                            <h4>PDF ↔ Text</h4>
+                            <p>Raw Extraction</p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Images -->
+                <div class="hub-section">
+                    <div class="hub-section-header">
+                        <i data-lucide="image" size="16"></i>
+                        <span>IMAGES</span>
+                    </div>
+                    <div class="hub-grid">
+                        <div class="hub-card" onclick="window.location.href='converter.html'">
+                            <i data-lucide="file-type" size="24"></i>
+                            <h4>Image ↔ PDF</h4>
+                            <p>Batch Combine</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=jpg-png'">
+                            <i data-lucide="camera" size="24"></i>
+                            <h4>JPG ↔ PNG</h4>
+                            <p>Alpha Support</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=heic-jpg'">
+                            <i data-lucide="smartphone" size="24"></i>
+                            <h4>HEIC ↔ JPG</h4>
+                            <p>iPhone Native</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=webp-img'">
+                            <i data-lucide="layers" size="24"></i>
+                            <h4>WebP ↔ All</h4>
+                            <p>Web Optimized</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Video/Audio -->
+                <div class="hub-section">
+                    <div class="hub-section-header">
+                        <i data-lucide="video" size="16"></i>
+                        <span>VIDEO / AUDIO</span>
+                    </div>
+                    <div class="hub-grid">
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=mp4-mp3'">
+                            <i data-lucide="music" size="24"></i>
+                            <h4>MP4 ↔ MP3</h4>
+                            <p>Audio Extractor</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=mov-mp4'">
+                            <i data-lucide="play" size="24"></i>
+                            <h4>MOV ↔ MP4</h4>
+                            <p>Standardize</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=wav-audio'">
+                            <i data-lucide="mic" size="24"></i>
+                            <h4>WAV ↔ All</h4>
+                            <p>Lossless Pro</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- E-Books -->
+                <div class="hub-section">
+                    <div class="hub-section-header">
+                        <i data-lucide="book-open" size="16"></i>
+                        <span>E-BOOKS</span>
+                    </div>
+                    <div class="hub-grid">
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=epub-pdf'">
+                            <i data-lucide="book" size="24"></i>
+                            <h4>EPUB ↔ PDF</h4>
+                            <p>Reader Sync</p>
+                        </div>
+                        <div class="hub-card" onclick="window.location.href='universal-converter.html?mode=mobi-epub'">
+                            <i data-lucide="tablet" size="24"></i>
+                            <h4>MOBI ↔ EPUB</h4>
+                            <p>Kindle Native</p>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>

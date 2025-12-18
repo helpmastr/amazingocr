@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmazingSuite | Universal Converter</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="terminal.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="terminal-body">
+    <div class="terminal-container">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="window-controls">
+                    <span class="control close" onclick="window.location.href='hub.html'"></span>
+                    <span class="control minimize"></span>
+                    <span class="control maximize"></span>
+                </div>
+                <div class="terminal-title">
+                    <i id="header-icon" data-lucide="refresh-cw" size="14"></i> af — <span
+                        id="mode-slug">processor</span> — universal-engine
+                </div>
+            </div>
+
+            <div class="terminal-content" style="height: 500px; display: flex; flex-direction: column;">
+                <div class="terminal-prompt-line" style="margin-bottom: 20px;">
+                    <span class="terminal-text-green">></span> <span class="terminal-text-muted">SYSTEM_READY</span>
+                </div>
+
+                <div id="dropzone-view"
+                    style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <div id="dropzone" class="terminal-dropzone">
+                        <i id="main-icon" data-lucide="upload-cloud" size="48" class="terminal-text-blue"></i>
+                        <h2 id="mode-title" class="terminal-text-green" style="margin: 15px 0 5px; font-weight: 700;">>
+                            INITIALIZING_MODULE...</h2>
+                        <p id="mode-desc" class="terminal-text-muted" style="font-size: 12px;">Drop files here to start
+                            the process</p>
+                    </div>
+                </div>
+                <input type="file" id="file-input" multiple style="display: none;">
+
+                <div id="status-section" style="display: none; padding: 20px; flex: 1;">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 12px;">
+                        <span id="status-label" class="terminal-text-green">PREPARING_BUFFERS...</span>
+                        <span id="progress-percent" class="terminal-text-green">0%</span>
+                    </div>
+                    <div class="progress-container"
+                        style="background: rgba(255,255,255,0.05); height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="progress-bar"
+                            style="height: 100%; width: 0%; background: var(--terminal-text); box-shadow: 0 0 10px var(--terminal-text); transition: width 0.1s;">
+                        </div>
+                    </div>
+                    <div id="processing-log" class="terminal-text-muted"
+                        style="font-size: 11px; margin-top: 25px; height: 150px; overflow-y: auto; line-height: 1.6; border-left: 1px solid rgba(0,255,65,0.2); padding-left: 15px;">
+                    </div>
+                </div>
+
+                <div id="results-section"
+                    style="display: none; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                    <div class="terminal-text-green" style="margin-bottom: 25px; font-size: 18px; font-weight: 700;">
+                        <i data-lucide="check-circle" size="24" style="vertical-align: middle; margin-right: 10px;"></i>
+                        <span id="finish-message">TASK_COMPLETED_SUCCESSFULLY</span>
+                    </div>
+                    <div class="terminal-button-group" style="justify-content: center;">
+                        <button id="download-btn" class="terminal-btn primary">
+                            <i data-lucide="download" size="14"></i> DOWNLOAD_RESULT
+                        </button>
+                        <button id="reset-btn" class="terminal-btn">
+                            <i data-lucide="refresh-cw" size="14"></i> NEW_TASK
+                        </button>
+                    </div>
+                </div>
+
+                <div class="terminal-prompt-footer" style="margin-top: 20px; font-size: 12px; opacity: 0.5;">
+                    <span class="terminal-text-blue">af@amazing-suite</span> <span class="terminal-text-muted">:~
+                        $</span> <span class="cursor"
+                        style="display: inline-block; width: 8px; height: 15px; background: #fff; vertical-align: middle;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- macOS Dock -->
+    <div class="terminal-dock">
+        <div class="dock-item" data-label="Home" onclick="window.location.href='index.html'">
+            <i data-lucide="home"></i>
+        </div>
+        <div class="dock-item" data-label="Converter Hub" onclick="window.location.href='hub.html'">
+            <i data-lucide="layout-grid"></i>
+        </div>
+        <div class="dock-item" data-label="OCR Engine" onclick="window.location.href='engine.html'">
+            <i data-lucide="scan-text"></i>
+        </div>
+        <div class="dock-item" data-label="GitHub"
+            onclick="window.open('https://github.com/helpmastr/amazingocr', '_blank')">
+            <i data-lucide="github"></i>
+        </div>
+    </div>
+
+    <script>
+        const MODES = {
+            'pdf-word': { title: 'PDF ↔ WORD', icon: 'file-check', slug: 'pdf-to-docx', desc: 'Convert PDF to editable Word document' },
+            'pdf-excel': { title: 'PDF ↔ EXCEL', icon: 'file-spreadsheet', slug: 'pdf-to-xlsx', desc: 'Extract data tables to Excel' },
+            'pdf-ppt': { title: 'PDF ↔ PPT', icon: 'presentation', slug: 'pdf-to-pptx', desc: 'Convert PDF to PowerPoint slides' },
+            'pdf-text': { title: 'PDF ↔ TEXT', icon: 'file-type-2', slug: 'pdf-to-txt', desc: 'Extract raw text from PDF' },
+            'jpg-png': { title: 'JPG ↔ PNG', icon: 'camera', slug: 'image-swapper', desc: 'Convert between JPG and PNG formats' },
+            'heic-jpg': { title: 'HEIC ↔ JPG', icon: 'smartphone', slug: 'heic-converter', desc: 'Convert iPhone HEIC to JPG' },
+            'webp-img': { title: 'WEBP ↔ ANY', icon: 'layers', slug: 'webp-engine', desc: 'WebP optimization and conversion' },
+            'mp4-mp3': { title: 'MP4 ↔ MP3', icon: 'music', slug: 'audio-ext', desc: 'Extract high-quality MP3 from Video' },
+            'mov-mp4': { title: 'MOV ↔ MP4', icon: 'play', slug: 'mov-to-mp4', desc: 'Standardize Apple MOV to MP4' },
+            'wav-audio': { title: 'WAV ↔ ANY', icon: 'mic', slug: 'wav-pro', desc: 'Lossless audio conversion' },
+            'epub-pdf': { title: 'EPUB ↔ PDF', icon: 'book', slug: 'epub-to-pdf', desc: 'Convert E-books to PDF' },
+            'mobi-epub': { title: 'MOBI ↔ EPUB', icon: 'tablet', slug: 'mobi-to-epub', desc: 'Convert Kindle MOBI to EPUB' }
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode') || 'pdf-word';
+        const config = MODES[mode] || MODES['pdf-word'];
+
+        // UI Setup
+        document.getElementById('mode-title').textContent = `> ${config.title}`;
+        document.getElementById('mode-desc').textContent = config.desc;
+        document.getElementById('mode-slug').textContent = config.slug;
+
+        const mainIcon = document.getElementById('main-icon');
+        const headerIcon = document.getElementById('header-icon');
+        mainIcon.setAttribute('data-lucide', config.icon);
+        headerIcon.setAttribute('data-lucide', config.icon);
+
+        lucide.createIcons();
+
+        const fileInput = document.getElementById('file-input');
+        const dropzone = document.getElementById('dropzone');
+        const statusSection = document.getElementById('status-section');
+        const resultsSection = document.getElementById('results-section');
+        const processingLog = document.getElementById('processing-log');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const statusLabel = document.getElementById('status-label');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) startProcessing(Array.from(e.target.files));
+        });
+
+        async function startProcessing(files) {
+            document.getElementById('dropzone-view').style.display = 'none';
+            statusSection.style.display = 'block';
+
+            const logs = [
+                `MOUNTING_FILESYSTEM...`,
+                `DETECTING_BUFFER_MIME: ${files[0].type || 'binary/stream'}`,
+                `ALLOCATING_CORE_MEMORY...`,
+                `INITIALIZING_CONVERSION_PIPELINE...`,
+                `RUNNING_TRANSCODE_WASP_v2.4...`,
+                `CLEANING_TEMP_CACHE...`,
+                `FINALIZING_OUTPUT_STREAM...`
+            ];
+
+            for (let i = 0; i <= 100; i += 2) {
+                progressBar.style.width = `${i}%`;
+                progressPercent.textContent = `${i}%`;
+
+                if (i % 15 === 0) {
+                    const logIdx = Math.floor(i / 15);
+                    if (logs[logIdx]) {
+                        const line = document.createElement('div');
+                        line.textContent = `> ${logs[logIdx]}`;
+                        processingLog.appendChild(line);
+                        statusLabel.textContent = logs[logIdx];
+                    }
+                }
+
+                await new Promise(r => setTimeout(r, 40));
+            }
+
+            statusSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            document.getElementById('finish-message').textContent = `${config.slug.toUpperCase()}_SUCCESS`;
+            lucide.createIcons();
+        }
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        document.getElementById('download-btn').addEventListener('click', () => {
+            alert('Simulation Mode: In a production environment, this would start the download of the processed file.');
+        });
+    </script>
+</body>
+
+</html>
