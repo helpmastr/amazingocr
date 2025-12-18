@@ -137,8 +137,8 @@ async function processFile(file) {
     const results = await Promise.all(indices.map(async (i) => {
         const page = await pdf.getPage(i);
 
-        // High-DPI Rendering (4.5x scale ~ 324 DPI for extreme detail)
-        const viewport = page.getViewport({ scale: 4.5 });
+        // Ultra-High-DPI Rendering (14x scale ~ 1000 DPI for atomic accuracy)
+        const viewport = page.getViewport({ scale: 14.0 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
@@ -150,6 +150,14 @@ async function processFile(file) {
         const processedCanvas = preprocessImage(canvas);
 
         const result = await scheduler.addJob('recognize', processedCanvas, { pdfTitle: `Page ${i}` }, { pdf: true });
+
+        // Memory Cleanup: Explicitly clear large canvases
+        canvas.width = 0;
+        canvas.height = 0;
+        if (processedCanvas !== canvas) {
+            processedCanvas.width = 0;
+            processedCanvas.height = 0;
+        }
 
         // Update progress as pages complete
         completedPages++;
