@@ -39,9 +39,21 @@ const bootSequence = [
     { text: 'Last login: ' + new Date().toLocaleString(), type: 'info' },
     { text: 'Initializing neural network cores... [DONE]', type: 'success' },
     { text: 'Loading 500 DPI Atomic OCR modules... [DONE]', type: 'success' },
+    { id: 'stars', text: 'METRIC: GITHUB_REPOS_STARS -> [CONNECTING...]', type: 'info' },
     { text: 'System ready. Type <span class="terminal-text-blue">help</span> for available commands.', type: 'info' },
     { text: '----------------------------------------', type: 'info' }
 ];
+
+async function fetchStars() {
+    try {
+        const response = await fetch('https://api.github.com/repos/helpmastr/amazingocr');
+        const data = await response.json();
+        const count = data.stargazers_count || 0;
+        return count > 0 ? `${count} STARS` : 'ONLINE';
+    } catch (e) {
+        return 'AVAILABLE';
+    }
+}
 
 async function addLine(text, type = 'default') {
     const div = document.createElement('div');
@@ -64,6 +76,10 @@ async function addLine(text, type = 'default') {
 
 async function startBoot() {
     for (let line of bootSequence) {
+        if (line.id === 'stars') {
+            const starStatus = await fetchStars();
+            line.text = `METRIC: GITHUB_REPOS_STARS -> <span class="terminal-text-blue">${starStatus}</span>`;
+        }
         await addLine(line.text, line.type);
         await new Promise(r => setTimeout(r, 200));
     }
