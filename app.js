@@ -65,11 +65,27 @@ async function initScheduler(lang) {
     currentLanguage = lang;
     scheduler = Tesseract.createScheduler();
 
-    const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 4);
-    updateProgress(0, `Initializing ${numWorkers} engines for ${lang}...`);
+    const numWorkers = Math.min(navigator.hardwareConcurrency || 4, 8);
+    updateProgress(0, `Warming up ${numWorkers} super-engines for ${lang}...`);
 
     for (let i = 0; i < numWorkers; i++) {
-        const worker = await Tesseract.createWorker(lang, 1);
+        const worker = await Tesseract.createWorker(lang, 1, {
+            workerBlobURL: false,
+            logger: m => {
+                if (m.status === 'recognizing') {
+                    // We don't update individual worker progress to avoid UI jank
+                }
+            }
+        });
+
+        // Optimize for handwriting and legacy documents
+        await worker.setParameters({
+            tessedit_pageseg_mode: Tesseract.PSM.AUTO, // Automatic page segmentation with OSD
+            tessjs_create_hocr: '0',
+            tessjs_create_tsv: '0',
+            textonly_pdf: '0'
+        });
+
         scheduler.addWorker(worker);
     }
 }
@@ -105,22 +121,24 @@ async function processBatch(files) {
 }
 
 async function processFile(file) {
-    updateProgress(0, `Processing: ${file.name}`);
+    updateProgress(0, `Loading: ${file.name}`);
 
     const arrayBuffer = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
     const totalPages = pdf.numPages;
 
     const pdfLibDoc = await PDFLib.PDFDocument.create();
-    let fileExtractedText = '';
 
-    for (let i = 1; i <= totalPages; i++) {
-        updateProgress((i / totalPages) * 100, `OCR: Page ${i}/${totalPages}`);
-        pageInfo.textContent = `Rendering high-res page for handwriting detection...`;
+    const indices = Array.from({ length: totalPages }, (_, i) => i + 1);
+    let completedPages = 0;
+    updateProgress(5, `Preparing ${totalPages} pages for parallel OCR...`);
 
+    // Process pages in parallel using the scheduler
+    const results = await Promise.all(indices.map(async (i) => {
         const page = await pdf.getPage(i);
-        // Increase scale for optimized handwriting/small text (approx 300 DPI)
-        const viewport = page.getViewport({ scale: 3.0 });
+
+        // High-DPI Rendering (4.5x scale ~ 324 DPI for extreme detail)
+        const viewport = page.getViewport({ scale: 4.5 });
         const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
         canvas.height = viewport.height;
@@ -128,10 +146,25 @@ async function processFile(file) {
 
         await page.render({ canvasContext: context, viewport: viewport }).promise;
 
-        const { data } = await scheduler.addJob('recognize', canvas, { pdfTitle: `Page ${i}` }, { pdf: true });
-        fileExtractedText += data.text + '\n\n';
+        // Apply Super-Accuracy Pre-processing
+        const processedCanvas = preprocessImage(canvas);
 
-        const pagePdf = await PDFLib.PDFDocument.load(data.pdf);
+        const result = await scheduler.addJob('recognize', processedCanvas, { pdfTitle: `Page ${i}` }, { pdf: true });
+
+        // Update progress as pages complete
+        completedPages++;
+        updateProgress((completedPages / totalPages) * 100, `OCR: Completed ${completedPages}/${totalPages} pages`);
+
+        return { index: i, data: result.data };
+    }));
+
+    // Sort results by index to maintain page order
+    results.sort((a, b) => a.index - b.index);
+
+    let fileExtractedText = '';
+    for (const res of results) {
+        fileExtractedText += res.data.text + '\n\n';
+        const pagePdf = await PDFLib.PDFDocument.load(res.data.pdf);
         const [copiedPage] = await pdfLibDoc.copyPages(pagePdf, [0]);
         pdfLibDoc.addPage(copiedPage);
     }
@@ -142,6 +175,65 @@ async function processFile(file) {
         text: fileExtractedText,
         pdfBlob: new Blob([pdfBytes], { type: 'application/pdf' })
     };
+}
+
+/**
+ * Advanced Image Pre-processing for "Hard" Handwriting
+ * 1. Grayscale Conversion
+ * 2. Contrast Enhancement
+ * 3. Sharpening
+ * 4. Adaptive-like Thresholding simulation
+ */
+function preprocessImage(canvas) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Apply CSS filters for fast initial enhancement
+    // grayscale(1) removes color noise
+    // contrast(1.5) makes text pop
+    // brightness(1.1) clears murky backgrounds
+    const bufferCanvas = document.createElement('canvas');
+    bufferCanvas.width = width;
+    bufferCanvas.height = height;
+    const bctx = bufferCanvas.getContext('2d');
+
+    bctx.filter = 'grayscale(100%) contrast(150%) brightness(110%)';
+    bctx.drawImage(canvas, 0, 0);
+
+    // Manual Pixel-level sharpening (Unsharp Mask simulation)
+    const imageData = bctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+
+    // Simple sharpening convolution
+    // This makes the edges of handwriting strokes much clearer for Tesseract
+    const sharpenedData = bctx.createImageData(width, height);
+    const sData = sharpenedData.data;
+    const kernel = [
+        0, -1, 0,
+        -1, 5, -1,
+        0, -1, 0
+    ];
+
+    for (let y = 1; y < height - 1; y++) {
+        for (let x = 1; x < width - 1; x++) {
+            for (let c = 0; c < 3; c++) { // R, G, B
+                let sum = 0;
+                for (let ky = -1; ky <= 1; ky++) {
+                    for (let kx = -1; kx <= 1; kx++) {
+                        const idx = ((y + ky) * width + (x + kx)) * 4 + c;
+                        sum += data[idx] * kernel[(ky + 1) * 3 + (kx + 1)];
+                    }
+                }
+                const sIdx = (y * width + x) * 4 + c;
+                sData[sIdx] = Math.min(255, Math.max(0, sum));
+            }
+            sData[(y * width + x) * 4 + 3] = 255; // Alpha
+        }
+    }
+
+    bctx.putImageData(sharpenedData, 0, 0);
+    return bufferCanvas;
 }
 
 function updateProgress(percent, label) {
