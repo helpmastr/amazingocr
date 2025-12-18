@@ -27,7 +27,7 @@
                     <span class="control maximize"></span>
                 </div>
                 <div class="terminal-title">
-                    <i data-lucide="refresh-cw" size="14"></i> af — universal-converter — v3
+                    <i data-lucide="refresh-cw" size="14"></i> af — universal-converter — v3.1
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
                         <div class="hub-card" onclick="selectInputType('img')">
                             <i data-lucide="image" size="28"></i>
                             <h4>Images</h4>
-                            <p>JPG, PNG, WebP, GIF</p>
+                            <p>JPG, PNG, WebP, GIF, BMP</p>
                         </div>
                     </div>
                     <p class="terminal-text-muted" style="text-align: center; margin-top: 20px; font-size: 11px;">
@@ -98,7 +98,7 @@
                                 style="width: 18px; height: 18px; accent-color: var(--terminal-text);">
                             <label for="ocr-toggle" class="terminal-text-muted"
                                 style="font-size: 13px; cursor: pointer;">
-                                <span class="terminal-text-green">APPLY_OCR</span> — Extract text from output
+                                <span class="terminal-text-green">FORCE_OCR</span> — Use AI to extract text from pixels
                             </label>
                         </div>
 
@@ -187,18 +187,14 @@
             'img': 'IMAGES'
         };
 
-        const OUTPUT_FORMATS = {
-            'doc': [
-                { value: 'png', label: 'PNG (Image)' },
-                { value: 'jpg', label: 'JPG (Image)' }
-            ],
-            'img': [
-                { value: 'pdf', label: 'PDF (Document)' },
-                { value: 'png', label: 'PNG' },
-                { value: 'jpg', label: 'JPG' },
-                { value: 'webp', label: 'WebP' }
-            ]
-        };
+        const ALL_OUTPUT_FORMATS = [
+            { value: 'pdf', label: 'PDF (Document)', types: ['doc', 'img'] },
+            { value: 'png', label: 'PNG (Image)', types: ['doc', 'img'] },
+            { value: 'jpg', label: 'JPG (Image)', types: ['doc', 'img'] },
+            { value: 'webp', label: 'WebP (Image)', types: ['doc', 'img'] },
+            { value: 'txt', label: 'TXT (Text Extraction)', types: ['doc', 'img'] },
+            { value: 'bmp', label: 'BMP (Image)', types: ['doc', 'img'] }
+        ];
 
         let currentInputType = null;
         let uploadedFile = null;
@@ -221,7 +217,6 @@
             lucide.createIcons();
         }
 
-        // File upload handlers
         const dropzone = document.getElementById('dropzone');
         const fileInput = document.getElementById('file-input');
 
@@ -248,20 +243,20 @@
         function populateOutputFormats() {
             const select = document.getElementById('output-format');
             select.innerHTML = '';
-            const formats = OUTPUT_FORMATS[currentInputType] || [];
-            formats.forEach(fmt => {
+
+            // Show all formats that support this input type
+            ALL_OUTPUT_FORMATS.forEach(fmt => {
                 const opt = document.createElement('option');
                 opt.value = fmt.value;
                 opt.textContent = fmt.label;
                 select.appendChild(opt);
             });
 
-            // Show OCR option only for image outputs
+            // Context-aware OCR toggle
             const ocrOption = document.getElementById('ocr-option');
-            ocrOption.style.display = currentInputType === 'doc' ? 'flex' : 'none';
+            ocrOption.style.display = 'flex'; // Always show for flexibility
         }
 
-        // Progress helpers
         function updateProgress(percent, label) {
             document.getElementById('progress-bar').style.width = `${percent}%`;
             document.getElementById('progress-percent').textContent = `${Math.round(percent)}%`;
@@ -274,12 +269,11 @@
             log.scrollTop = log.scrollHeight;
         }
 
-        // Convert button
         document.getElementById('convert-btn').addEventListener('click', startConversion);
 
         async function startConversion() {
             const outputFormat = document.getElementById('output-format').value;
-            const applyOCR = document.getElementById('ocr-toggle').checked;
+            const forceOCR = document.getElementById('ocr-toggle').checked;
 
             goToStep(4);
             document.getElementById('processing-log').innerHTML = '';
@@ -297,15 +291,21 @@
                 let result;
 
                 if (currentInputType === 'img') {
-                    // Image conversions
                     if (outputFormat === 'pdf') {
                         result = await convertImageToPDF(uploadedFile);
+                    } else if (outputFormat === 'txt') {
+                        result = await runOCR(uploadedFile);
                     } else {
                         result = await convertImageFormat(uploadedFile, outputFormat);
                     }
                 } else if (currentInputType === 'doc') {
-                    // PDF to Image
-                    result = await convertPDFToImages(uploadedFile, outputFormat, applyOCR);
+                    if (outputFormat === 'txt') {
+                        result = await extractTextFromPDF(uploadedFile, forceOCR);
+                    } else if (outputFormat === 'pdf') {
+                        result = await optimizePDF(uploadedFile);
+                    } else {
+                        result = await convertPDFToImages(uploadedFile, outputFormat, forceOCR);
+                    }
                 }
 
                 convertedBlob = result.blob;
@@ -316,228 +316,225 @@
                 await sleep(300);
 
                 goToStep(5);
-                document.getElementById('finish-message').textContent = `CONVERTED_TO_${outputFormat.toUpperCase()}_SUCCESS`;
+                document.getElementById('finish-message').textContent = `SUCCESS: CONVERTED_TO_${outputFormat.toUpperCase()}`;
 
-                if (result.ocrText) {
+                if (result.ocrText || result.text) {
                     document.getElementById('ocr-results').style.display = 'block';
-                    document.getElementById('ocr-text').value = result.ocrText;
+                    document.getElementById('ocr-text').value = result.ocrText || result.text;
                 }
 
                 lucide.createIcons();
 
             } catch (err) {
+                console.error(err);
                 addLog(`ERROR: ${err.message}`);
                 updateProgress(0, 'CONVERSION_FAILED');
-                alert('Conversion failed: ' + err.message);
+                alert('An error occurred during processing: ' + err.message);
             }
         }
 
-        // ==================== ACTUAL CONVERSION FUNCTIONS ====================
+        // ==================== STABLE OCR HANDLER ====================
+
+        async function runOCR(file) {
+            addLog('INITIALIZING_OCR_ENGINE...');
+            updateProgress(20, 'INITIALIZING_OCR_ENGINE...');
+
+            const worker = await Tesseract.createWorker('eng', 1, {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        const prog = 20 + (m.progress * 70);
+                        updateProgress(prog, 'RECOGNIZING_TEXT...');
+                    }
+                }
+            });
+
+            try {
+                addLog('LOADING_IMAGE_FOR_OCR...');
+                const img = await loadImage(file);
+
+                addLog('PERFORMING_RECOGNITION...');
+                const { data: { text } } = await worker.recognize(img);
+
+                await worker.terminate();
+
+                addLog('OCR_DONE');
+                const blob = new Blob([text], { type: 'text/plain' });
+                const baseName = file.name.replace(/\.[^.]+$/, '');
+
+                return { blob, filename: `${baseName}_ocr.txt`, ocrText: text };
+            } catch (e) {
+                await worker.terminate();
+                throw e;
+            }
+        }
+
+        // ==================== PDF TEXT EXTRACTION ====================
+
+        async function extractTextFromPDF(file, forceOCR) {
+            if (forceOCR) return await convertPDFToImages(file, 'txt', true);
+
+            addLog('EXTRACTING_TEXT_LAYER...');
+            updateProgress(30, 'EXTRACTING_TEXT_LAYER...');
+
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = '';
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                addLog(`SCANNING_PAGE_${i}...`);
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const strings = content.items.map(item => item.str);
+                fullText += `--- Page ${i} ---\n${strings.join(' ')}\n\n`;
+                updateProgress(30 + (i / pdf.numPages * 60), `SCANNING_PAGE_${i}...`);
+            }
+
+            const blob = new Blob([fullText], { type: 'text/plain' });
+            const baseName = file.name.replace(/\.[^.]+$/, '');
+            return { blob, filename: `${baseName}_extracted.txt`, text: fullText };
+        }
+
+        // ==================== IMAGE CONVERSIONS ====================
 
         async function convertImageFormat(file, targetFormat) {
             addLog('LOADING_IMAGE...');
             updateProgress(20, 'LOADING_IMAGE...');
 
             const img = await loadImage(file);
-
-            addLog('CREATING_CANVAS...');
-            updateProgress(40, 'CREATING_CANVAS...');
-
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
 
-            // White background for JPG (no transparency)
             if (targetFormat === 'jpg' || targetFormat === 'jpeg') {
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
             }
 
             ctx.drawImage(img, 0, 0);
+            updateProgress(60, 'ENCODING...');
 
-            addLog('ENCODING_OUTPUT...');
-            updateProgress(70, 'ENCODING_OUTPUT...');
+            const mimeMap = {
+                'jpg': 'image/jpeg',
+                'png': 'image/png',
+                'webp': 'image/webp',
+                'bmp': 'image/bmp'
+            };
 
-            const mimeType = targetFormat === 'jpg' ? 'image/jpeg' :
-                targetFormat === 'webp' ? 'image/webp' : 'image/png';
-
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.92));
-
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeMap[targetFormat] || 'image/png', 0.92));
             const baseName = file.name.replace(/\.[^.]+$/, '');
-            const filename = `${baseName}_converted.${targetFormat}`;
 
-            updateProgress(90, 'FINALIZING...');
-            addLog('OUTPUT_READY');
-
-            return { blob, filename };
+            return { blob, filename: `${baseName}_converted.${targetFormat}` };
         }
 
         async function convertImageToPDF(file) {
-            addLog('LOADING_IMAGE...');
-            updateProgress(20, 'LOADING_IMAGE...');
-
-            const img = await loadImage(file);
-            const arrayBuffer = await file.arrayBuffer();
-
-            addLog('CREATING_PDF_DOCUMENT...');
-            updateProgress(40, 'CREATING_PDF_DOCUMENT...');
-
+            addLog('PDF_GENERATION_START...');
             const pdfDoc = await PDFLib.PDFDocument.create();
+            const imgBuffer = await file.arrayBuffer();
 
-            let embeddedImage;
-            const fileType = file.type;
-
-            if (fileType === 'image/png') {
-                embeddedImage = await pdfDoc.embedPng(arrayBuffer);
-            } else {
-                // Convert to JPG for other formats
+            let img;
+            if (file.type === 'image/png') img = await pdfDoc.embedPng(imgBuffer);
+            else if (file.type === 'image/jpeg' || file.type === 'image/jpg') img = await pdfDoc.embedJpg(imgBuffer);
+            else {
+                // For WebP/BMP, convert to JPG first via canvas
+                addLog('TRANSCODING_BUFFER...');
+                const loadedImg = await loadImage(file);
                 const canvas = document.createElement('canvas');
-                canvas.width = img.width;
-                canvas.height = img.height;
+                canvas.width = loadedImg.width;
+                canvas.height = loadedImg.height;
                 const ctx = canvas.getContext('2d');
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-
-                const jpgBlob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.92));
-                const jpgBuffer = await jpgBlob.arrayBuffer();
-                embeddedImage = await pdfDoc.embedJpg(jpgBuffer);
+                ctx.drawImage(loadedImg, 0, 0);
+                const jpgBlob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
+                img = await pdfDoc.embedJpg(await jpgBlob.arrayBuffer());
             }
 
-            addLog('ADDING_PAGE...');
-            updateProgress(60, 'ADDING_PAGE...');
-
-            const page = pdfDoc.addPage([embeddedImage.width, embeddedImage.height]);
-            page.drawImage(embeddedImage, {
-                x: 0,
-                y: 0,
-                width: embeddedImage.width,
-                height: embeddedImage.height
-            });
-
-            addLog('SAVING_PDF...');
-            updateProgress(80, 'SAVING_PDF...');
+            const page = pdfDoc.addPage([img.width, img.height]);
+            page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
 
             const pdfBytes = await pdfDoc.save();
-            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-
-            const baseName = file.name.replace(/\.[^.]+$/, '');
-            const filename = `${baseName}.pdf`;
-
-            addLog('OUTPUT_READY');
-
-            return { blob, filename };
+            return { blob: new Blob([pdfBytes], { type: 'application/pdf' }), filename: `${file.name.split('.')[0]}.pdf` };
         }
 
-        async function convertPDFToImages(file, outputFormat, applyOCR) {
-            addLog('LOADING_PDF...');
-            updateProgress(10, 'LOADING_PDF...');
+        // ==================== PDF TO IMAGES / OCR ====================
 
+        async function convertPDFToImages(file, outputFormat, forceOCR) {
+            addLog('PDF_INITIALIZE...');
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-            const totalPages = pdf.numPages;
 
-            addLog(`DETECTED_PAGES: ${totalPages}`);
+            const zip = outputFormat !== 'txt' ? new JSZip() : null;
+            let ocrFullText = '';
 
-            const images = [];
-            let ocrText = '';
+            const worker = forceOCR ? await Tesseract.createWorker('eng') : null;
 
-            for (let i = 1; i <= totalPages; i++) {
-                const progress = 10 + (70 * (i / totalPages));
-                addLog(`RENDERING_PAGE_${i}...`);
-                updateProgress(progress, `RENDERING_PAGE_${i}/${totalPages}...`);
-
+            for (let i = 1; i <= pdf.numPages; i++) {
+                addLog(`PROCESSING_PAGE_${i}...`);
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 2.0 }); // Good quality
-
+                const viewport = page.getViewport({ scale: 2.0 });
                 const canvas = document.createElement('canvas');
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
                 const ctx = canvas.getContext('2d');
-
                 await page.render({ canvasContext: ctx, viewport }).promise;
 
-                const mimeType = outputFormat === 'jpg' ? 'image/jpeg' : 'image/png';
-                const blob = await new Promise(resolve => canvas.toBlob(resolve, mimeType, 0.92));
-                images.push({ blob, pageNum: i });
-
-                // Run OCR if requested
-                if (applyOCR) {
-                    addLog(`OCR_SCANNING_PAGE_${i}...`);
-                    try {
-                        const result = await Tesseract.recognize(canvas, 'eng');
-                        ocrText += `--- Page ${i} ---\n${result.data.text}\n\n`;
-                    } catch (e) {
-                        ocrText += `--- Page ${i} ---\n[OCR Error: ${e.message}]\n\n`;
-                    }
+                if (forceOCR) {
+                    addLog(`OCR_RUNNING_P${i}...`);
+                    const { data: { text } } = await worker.recognize(canvas);
+                    ocrFullText += `--- Page ${i} ---\n${text}\n\n`;
+                    if (outputFormat === 'txt') continue;
                 }
+
+                if (zip) {
+                    const mime = outputFormat === 'jpg' ? 'image/jpeg' : 'image/png';
+                    const blob = await new Promise(r => canvas.toBlob(r, mime, 0.9));
+                    zip.file(`page_${i}.${outputFormat}`, blob);
+                }
+
+                updateProgress(10 + (i / pdf.numPages * 80), `PROCESSING_PAGE_${i}...`);
             }
 
-            addLog('PACKAGING_OUTPUT...');
-            updateProgress(85, 'PACKAGING_OUTPUT...');
+            if (worker) await worker.terminate();
 
-            let resultBlob, resultFilename;
-
-            if (images.length === 1) {
-                resultBlob = images[0].blob;
-                const baseName = file.name.replace(/\.[^.]+$/, '');
-                resultFilename = `${baseName}_page1.${outputFormat}`;
-            } else {
-                // Multiple pages - create ZIP
-                addLog('CREATING_ZIP_ARCHIVE...');
-                const zip = new JSZip();
-                const baseName = file.name.replace(/\.[^.]+$/, '');
-
-                for (const img of images) {
-                    zip.file(`${baseName}_page${img.pageNum}.${outputFormat}`, img.blob);
-                }
-
-                if (ocrText) {
-                    zip.file(`${baseName}_ocr.txt`, ocrText);
-                }
-
-                resultBlob = await zip.generateAsync({ type: 'blob' });
-                resultFilename = `${baseName}_pages.zip`;
+            const baseName = file.name.replace(/\.[^.]+$/, '');
+            if (outputFormat === 'txt') {
+                return { blob: new Blob([ocrFullText], { type: 'text/plain' }), filename: `${baseName}_ocr.txt`, text: ocrFullText };
             }
 
-            addLog('OUTPUT_READY');
-
-            return { blob: resultBlob, filename: resultFilename, ocrText: applyOCR ? ocrText : null };
+            if (ocrFullText) zip.file('ocr_results.txt', ocrFullText);
+            const content = await zip.generateAsync({ type: 'blob' });
+            return { blob: content, filename: `${baseName}_export.zip` };
         }
 
-        // Helpers
+        async function optimizePDF(file) {
+            addLog('RE_SAVING_PDF...');
+            const bytes = await file.arrayBuffer();
+            const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+            const out = await pdfDoc.save();
+            return { blob: new Blob([out], { type: 'application/pdf' }), filename: `optimized_${file.name}` };
+        }
+
         function loadImage(file) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
                 img.onload = () => resolve(img);
-                img.onerror = reject;
+                img.onerror = () => reject(new Error('Failed to load image.'));
                 img.src = URL.createObjectURL(file);
             });
         }
 
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-        // Download handler
         document.getElementById('download-btn').addEventListener('click', () => {
-            if (!convertedBlob) {
-                alert('No converted file available');
-                return;
-            }
-
+            if (!convertedBlob) return;
             const url = URL.createObjectURL(convertedBlob);
             const a = document.createElement('a');
-            a.href = url;
-            a.download = convertedFileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            a.href = url; a.download = convertedFileName;
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
         });
 
-        // Initialize
         lucide.createIcons();
     </script>
 </body>
