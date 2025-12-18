@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AmazingSuite | Image to PDF</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">
+                <i data-lucide="arrow-left" size="24"></i>
+                <h1>Image to PDF</h1>
+            </div>
+        </header>
+
+        <main class="glass-card">
+            <div id="dropzone" class="dropzone">
+                <div class="dropzone-content">
+                    <i data-lucide="file-type"></i>
+                    <h3>Drop Images (JPG/PNG)</h3>
+                    <p>Select multiple images to combine into one PDF</p>
+                </div>
+                <input type="file" id="file-input" accept="image/png, image/jpeg" multiple>
+            </div>
+
+            <div id="status-section" class="status-section" style="display: none;">
+                <div class="status-text">
+                    <span id="status-label">Converting...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress-container">
+                    <div id="progress-bar"></div>
+                </div>
+            </div>
+
+            <div id="results-section" class="results-section" style="display: none;">
+                <div class="action-buttons">
+                    <button id="download-btn" class="btn primary">
+                        <i data-lucide="download" size="18"></i> Download PDF
+                    </button>
+                    <button id="reset-btn" class="btn secondary">
+                        <i data-lucide="refresh-cw" size="18"></i> New Conversion
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('file-input');
+        const dropzone = document.getElementById('dropzone');
+        const statusSection = document.getElementById('status-section');
+        const resultsSection = document.getElementById('results-section');
+        const downloadBtn = document.getElementById('download-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const progressBar = document.getElementById('progress-bar');
+        const progressPercent = document.getElementById('progress-percent');
+        const statusLabel = document.getElementById('status-label');
+
+        let pdfBlob = null;
+
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length > 0) convertImages(files);
+        });
+
+        async function convertImages(files) {
+            dropzone.style.display = 'none';
+            statusSection.style.display = 'block';
+
+            const pdfDoc = await PDFLib.PDFDocument.create();
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const percent = ((i + 1) / files.length) * 100;
+                statusLabel.textContent = `Processing: ${file.name}`;
+                progressBar.style.width = `${percent}%`;
+                progressPercent.textContent = `${Math.round(percent)}%`;
+
+                const arrayBuffer = await file.arrayBuffer();
+                let image;
+                if (file.type === 'image/png') {
+                    image = await pdfDoc.embedPng(arrayBuffer);
+                } else {
+                    image = await pdfDoc.embedJpg(arrayBuffer);
+                }
+
+                const page = pdfDoc.addPage([image.width, image.height]);
+                page.drawImage(image, {
+                    x: 0,
+                    y: 0,
+                    width: image.width,
+                    height: image.height,
+                });
+            }
+
+            const pdfBytes = await pdfDoc.save();
+            pdfBlob = new Blob([pdfBytes], { type: 'application/pdf' });
+
+            statusSection.style.display = 'none';
+            resultsSection.style.display = 'block';
+            lucide.createIcons();
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!pdfBlob) return;
+            const url = URL.createObjectURL(pdfBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'converted-images.pdf';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        resetBtn.addEventListener('click', () => {
+            dropzone.style.display = 'flex';
+            resultsSection.style.display = 'none';
+            fileInput.value = '';
+            pdfBlob = null;
+        });
+
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>

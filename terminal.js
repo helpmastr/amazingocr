@@ -14,7 +14,11 @@ const commands = {
         return 'Establishing secure connection...';
     },
 
-    '/convert': () => 'Error: PDF Converter module not yet initialized. Please check back soon.',
+    '/convert': () => {
+        addLine('Launching Image Converter...', 'info');
+        setTimeout(() => window.location.href = 'converter.html', 1000);
+        return 'Warming up PDF-Lib engines...';
+    },
 
     '/office': () => 'Error: Office Data Connector in Beta. Access restricted.',
 
