@@ -1,102 +1,98 @@
-# AmazingSuite - OCR & Converter Engine
+# ⚡ AmazingSuite - The Ultimate Terminal Productivity OS
 
-> **Terminal-Themed Productivity Suite** for high-efficiency document processing.
+> **A premium, high-performance toolkit** for OCR, Universal File Conversion, and Developer Utilities. Built with a stunning macOS terminal aesthetic and zero-latency client-side processing.
 
-![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge) ![Version](https://img.shields.io/badge/Version-2.0.0-blue?style=for-the-badge)
-
-**AmazingSuite** is a web-based toolkit designed with a premium **hacker/terminal aesthetic**. It provides local-first tools for OCR, file conversion, and document management without needing a backend.
+![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge) ![Version](https://img.shields.io/badge/Version-3.1.2-blue?style=for-the-badge) ![License](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)
 
 ---
 
-## 🖥️ Screenshots
+## 🖥️ System Preview
 
-| Command Center | Converter Hub |
+| Command Center (v2.4) | Master Hub |
 |:---:|:---:|
 | ![Index](screenshot_index.png) | ![Hub](screenshot_hub.png) |
 
-| Universal Converter | OCR Engine |
+| Universal Converter (v3.1) | Developer Terminal |
 |:---:|:---:|
-| ![Converter](screenshot_converter.png) | ![OCR](screenshot_ocr.png) |
+| ![Converter](screenshot_converter.png) | ![Dev Tools](screenshot_dev.png) |
+
+| OCR Engine (500 DPI) |
+|:---:|
+| ![OCR](screenshot_ocr.png) |
 
 ---
 
-## 🚀 Features
+## 🚀 Core Modules
 
-### Universal Converter v2
-A step-by-step conversion engine supporting **cross-format conversions**:
+### 1. Universal Converter v3.1 (Anything to Anything)
+The most powerful client-side converter. No servers. No data tracking. Pure logic.
+- **Documents**: Convert PDF to **DOCX (Word)**, TXT, or High-Res Images.
+- **Images**: Seamlessly swap between **WebP**, PNG, JPG, BMP, and PDF.
+- **Smart Extraction**: Features a hybrid engine that extracts native PDF text layers or performs OCR when needed.
+- **Batch Processing**: Multi-page conversions are automatically packaged into high-speed ZIP archives.
 
-1. **Select Input Type** — Documents, Images, Video, or Audio
-2. **Upload File** — Drag & drop or browse
-3. **Choose Output Format** — Any format (PDF→PNG, MP4→MP3, etc.)
-4. **Apply OCR** — Optional text extraction on output
-5. **Download** — Get your converted file
+### 2. Atomic OCR Engine
+Optimized for maximum accuracy and speed with three distinct performance profiles:
+- **🏎️ Super Fast**: Low resolution for instant previews.
+- **⚖️ Balanced**: Standard quality for clean documents.
+- **🎯 500 DPI Ultra**: Maximum precision for small text and handwriting.
+- **Output**: Generates searchable PDFs and raw text layers in 50+ languages.
 
-**Supported Formats:**
-- **Documents**: PDF, DOCX, TXT, RTF, ODT, HTML
-- **Images**: JPG, PNG, WebP, GIF, TIFF, BMP, HEIC
-- **Video**: MP4, MOV, AVI, MKV, WebM
-- **Audio**: MP3, WAV, AAC, FLAC, OGG, M4A
-
----
-
-### Atomic OCR Engine
-High-fidelity text extraction with performance profiles:
-
-- **Super Fast** — Optimized for speed
-- **Balanced** — Standard quality
-- **500 DPI** — Maximum accuracy for small text
-
-**Features:**
-- Multi-language support (English, Arabic, French, German, Spanish, Japanese)
-- Automatic large file optimization (prevents browser crashes)
-- Searchable PDF output
-- Batch processing with ZIP export
+### 3. Developer Utilities Terminal
+A dedicated suite for modern developer workflows:
+- **JSON Master**: Pretty print, minify, and lint your JSON data instantly.
+- **Codec Hub**: Instant Base64 and URL encoding/decoding.
+- **Security Station**: Local-first SHA-256/MD5 generation and **JWT decoding**.
+- **Gen Utils**: Live Epoch time conversion and UUID v4 generation.
 
 ---
 
-### Terminal Aesthetic
-- **Matrix Green** typography & glowing CRT effects
-- **macOS-style** window chrome and dock
-- **Glassmorphism** frosted glass UI elements
-- **Responsive** design with smooth animations
+## ⌨️ Power Commands
+Access AmazingSuite via the main terminal using these zsh-style commands:
+- `help` - Show all available modules.
+- `/hub` - Launch the Master Converter Hub.
+- `/ocr` - Boot the AmazingOCR Neural Engine.
+- `/dev` - Open the Developer Utilities Terminal.
+- `/clear` - Wipe the terminal buffer.
 
 ---
 
-## ⚙️ Installation
+## 🛠️ Technology Stack
+- **Frontend**: Vanilla JS (ES6+), CSS Grid/Flexbox
+- **Processing**: 
+    - `Tesseract.js` (OCR Engine)
+    - `pdf-lib` (PDF Creation/Modification)
+    - `pdf.js` (PDF Rendering & Extraction)
+    - `docx.js` (Word Document Generation)
+    - `JSZip` (Batch Packaging)
+    - `Crypto-JS` (Hashing & Security)
+- **Aesthetics**: Lucide Icons, JetBrains Mono, Frosted Glass (CSS Filters)
 
-No build required! Simply clone and open in your browser:
+---
+
+## ⚙️ Installation & Usage
+
+AmazingSuite is entirely static and requires no server. 
 
 ```bash
+# Clone the repository
 git clone https://github.com/helpmastr/amazingocr.git
+
+# Navigate and open
 cd amazingocr
 open index.html
 ```
 
 ---
 
-## 📁 Project Structure
-
-```
-├── index.html          # Command Center (home)
-├── hub.html            # Converter Hub
-├── universal-converter.html  # Step-by-step converter
-├── engine.html         # OCR Engine
-├── converter.html      # Image to PDF converter
-├── app.js              # OCR processing logic
-├── terminal.css        # Terminal theme styles
-└── style.css           # Base styles
-```
-
----
-
-## 🤝 Contributing
-
+## 🤝 Contributing & Community
+We welcome contributions! Whether it's adding new conversion modules or refining the terminal theme:
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your Changes (`git commit -m 'feat: add amazing utility'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 ---
 
-> Built with ❤️ using Vanilla JS, PDF-Lib, Tesseract.js, and pdf.js
+> Created with passion by [helpmastr](https://github.com/helpmastr). If you find this useful, **leave a ⭐ on GitHub!**
