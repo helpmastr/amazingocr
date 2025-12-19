@@ -1,4 +1,4 @@
-# ⚡ AmazingSuite - The Ultimate Terminal Productivity OS
+# ⚡ AmazingTools - The Ultimate Terminal Productivity OS
 
 > **A premium, high-performance toolkit** for OCR, Universal File Conversion, and Developer Utilities. Built with a stunning macOS terminal aesthetic and zero-latency client-side processing.
 
